@@ -48,9 +48,9 @@ Add a two-layer planning workflow to the config pack so humans get a short plain
 
 | Task     | Description | Completed | Date |
 | -------- | ----------- | --------- | ---- |
-| TASK-005 | Update `shared/.github/agents/implementation-plan.agent.md` frontmatter to make it an internal specialist, starting with `user-invocable: false` unless testing shows direct visibility is still required. |  |  |
-| TASK-006 | Add or revise opening guidance in `implementation-plan.agent.md` so it assumes a human checkpoint has already happened and that its audience is downstream agents, not the end user. |  |  |
-| TASK-007 | Add scope discipline to `implementation-plan.agent.md` so it produces a full multi-step plan only for the approved slice and does not silently broaden back to the original ambiguous request. |  |  |
+| TASK-005 | Update `shared/.github/agents/implementation-plan.agent.md` frontmatter to make it an internal specialist, starting with `user-invocable: false` unless testing shows direct visibility is still required. | ✅ | 2026-06-16 |
+| TASK-006 | Add or revise opening guidance in `implementation-plan.agent.md` so it assumes a human checkpoint has already happened and that its audience is downstream agents, not the end user. | ✅ | 2026-06-16 |
+| TASK-007 | Add scope discipline to `implementation-plan.agent.md` so it produces a full multi-step plan only for the approved slice and does not silently broaden back to the original ambiguous request. | ✅ | 2026-06-16 |
 
 ### Implementation Phase 3
 

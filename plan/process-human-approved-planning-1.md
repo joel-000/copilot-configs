@@ -4,13 +4,13 @@ version: 1.0
 date_created: 2026-06-16
 last_updated: 2026-06-16
 owner: Copilot Config Pack
-status: 'Planned'
+status: 'In progress'
 tags: [process, planning, agents, ux]
 ---
 
 # Introduction
 
-![Status: Planned](https://img.shields.io/badge/status-Planned-blue)
+![Status: In progress](https://img.shields.io/badge/status-In_progress-yellow)
 
 Add a two-layer planning workflow to the config pack so humans get a short plain-English checkpoint before deeper work starts, while downstream agents still receive a verbose multi-step execution plan they can follow.
 
@@ -37,10 +37,10 @@ Add a two-layer planning workflow to the config pack so humans get a short plain
 
 | Task     | Description | Completed | Date |
 | -------- | ----------- | --------- | ---- |
-| TASK-001 | Rewrite `shared/.github/agents/plan.agent.md` so its primary directive is to produce a succinct human-facing checkpoint before detailed planning or coding. |  |  |
-| TASK-002 | Define a fixed first-response shape in `plan.agent.md` that includes: user goal as understood, biggest uncertainty or assumption, smallest proposed next slice, and an approval/correction request. |  |  |
-| TASK-003 | Add explicit guard rails in `plan.agent.md` that forbid long code analysis dumps or comprehensive plans before approval unless the user directly asks for that level of detail. |  |  |
-| TASK-004 | Add handoffs in `plan.agent.md` for `Generate Execution Plan` and `Start Approved Slice`, both with `send: false` so the user can review the next action before it runs. |  |  |
+| TASK-001 | Rewrite `shared/.github/agents/plan.agent.md` so its primary directive is to produce a succinct human-facing checkpoint before detailed planning or coding. | ✅ | 2026-06-16 |
+| TASK-002 | Define a fixed first-response shape in `plan.agent.md` that includes: user goal as understood, biggest uncertainty or assumption, smallest proposed next slice, and an approval/correction request. | ✅ | 2026-06-16 |
+| TASK-003 | Add explicit guard rails in `plan.agent.md` that forbid long code analysis dumps or comprehensive plans before approval unless the user directly asks for that level of detail. | ✅ | 2026-06-16 |
+| TASK-004 | Add handoffs in `plan.agent.md` for `Generate Execution Plan` and `Start Approved Slice`, both with `send: false` so the user can review the next action before it runs. | ✅ | 2026-06-16 |
 
 ### Implementation Phase 2
 

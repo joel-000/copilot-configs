@@ -58,9 +58,9 @@ Add a two-layer planning workflow to the config pack so humans get a short plain
 
 | Task     | Description | Completed | Date |
 | -------- | ----------- | --------- | ---- |
-| TASK-008 | Create `shared/.github/agents/implementer.agent.md` as a general implementation agent that executes only the approved slice of work. |  |  |
-| TASK-009 | In `implementer.agent.md`, require the agent to stop and resummarize in plain English if it discovers the approved slice is too broad, ambiguous, or has expanded materially. |  |  |
-| TASK-010 | Ensure the implementer follows existing repo conventions for validation, scoped changes, and complete execution of the approved slice. |  |  |
+| TASK-008 | Create `shared/.github/agents/implementer.agent.md` as a general implementation agent that executes only the approved slice of work. | ✅ | 2026-06-16 |
+| TASK-009 | In `implementer.agent.md`, require the agent to stop and resummarize in plain English if it discovers the approved slice is too broad, ambiguous, or has expanded materially. | ✅ | 2026-06-16 |
+| TASK-010 | Ensure the implementer follows existing repo conventions for validation, scoped changes, and complete execution of the approved slice. | ✅ | 2026-06-16 |
 
 ### Implementation Phase 4
 

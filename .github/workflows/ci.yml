@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  pull_request:
+    paths:
+      - "shared/.github/**"
+      - "scripts/**"
+      - ".github/workflows/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "shared/.github/**"
+      - "scripts/**"
+      - ".github/workflows/**"
+  workflow_dispatch:
+
+jobs:
+  validate-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Validate pack structure and references
+        run: python scripts/validate.py
+
+      - name: Check Python script syntax
+        run: python -m py_compile scripts/validate.py
+
+      - name: Check installer script syntax
+        run: bash -n scripts/install.sh
+
+  test-installer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Smoke test installer (safe merge)
+        run: |
+          set -euo pipefail
+          target="$(mktemp -d)"
+          bash scripts/install.sh "$target"
+          test -d "$target/.github/agents"
+          test -d "$target/.github/instructions"
+          test -d "$target/.github/prompts"
+          test -d "$target/.github/skills"
+
+      - name: Verify installer idempotency
+        run: |
+          set -euo pipefail
+          target="$(mktemp -d)"
+          bash scripts/install.sh "$target"
+          first_checksum="$(tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner -cf - -C "$target/.github" . | sha256sum | cut -d' ' -f1)"
+          bash scripts/install.sh "$target"
+          second_checksum="$(tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner -cf - -C "$target/.github" . | sha256sum | cut -d' ' -f1)"
+          test "$first_checksum" = "$second_checksum"
+
+      - name: Verify prune mode removes unmanaged files
+        run: |
+          set -euo pipefail
+          target="$(mktemp -d)"
+          mkdir -p "$target/.github"
+          printf "keep me\n" > "$target/.github/unmanaged-file.txt"
+          bash scripts/install.sh --prune "$target"
+          test ! -f "$target/.github/unmanaged-file.txt"
+
+  validator-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Ensure validator fails on broken prompt agent references
+        run: |
+          set -euo pipefail
+          fixture_file="shared/.github/prompts/zz-regression-bad-agent.prompt.md"
+          cat > "$fixture_file" <<'EOF'
+          ---
+          name: 'Regression fixture'
+          description: 'Intentionally invalid prompt for validator regression checks'
+          agent: 'Nonexistent Agent Name'
+          ---
+
+          This file intentionally contains an invalid agent reference.
+          EOF
+
+          if python scripts/validate.py; then
+            echo "Expected validator failure, but it passed."
+            rm -f "$fixture_file"
+            exit 1
+          fi
+
+          rm -f "$fixture_file"

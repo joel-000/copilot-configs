@@ -68,6 +68,7 @@ The validator currently checks:
 - required frontmatter keys exist on agents, instructions, prompts, and skills
 - prompt `agent` references resolve to real agent names
 - duplicate agent names are not introduced
+- symlink artifacts are rejected under `shared/.github/`
 
 ## Maintenance guidance
 

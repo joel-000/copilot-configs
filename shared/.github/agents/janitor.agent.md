@@ -1,7 +1,7 @@
 ---
 description: 'Perform janitorial tasks on any codebase including cleanup, simplification, and tech debt remediation.'
 name: 'Universal Janitor'
-tools: [vscode/extensions, vscode/getProjectSetupInfo, vscode/installExtension, vscode/newWorkspace, vscode/runCommand, vscode/vscodeAPI, execute/getTerminalOutput, execute/runTask, execute/createAndRunTask, execute/runTests, execute/runInTerminal, execute/testFailure, execute/getTaskOutput, read/terminalSelection, read/terminalLastCommand, read/problems, read/readFile, 'github/*', edit/editFiles, search, web]
+tools: [read/readFile, read/problems, read/terminalSelection, read/terminalLastCommand, search, edit/editFiles, execute/getTerminalOutput, execute/runTask, execute/runTests, execute/getTaskOutput, execute/runInTerminal]
 ---
 # Universal Janitor
 

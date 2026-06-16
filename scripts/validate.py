@@ -51,6 +51,12 @@ def check_required_keys(
 	return keys, frontmatter
 
 
+def check_for_symlinks(base_dir: Path, errors: List[str]) -> None:
+	for path in sorted(base_dir.rglob("*")):
+		if path.is_symlink():
+			errors.append(f"symlink artifacts are not allowed: {path}")
+
+
 def main() -> int:
 	errors: List[str] = []
 
@@ -61,6 +67,7 @@ def main() -> int:
 			subdir = SHARED_GITHUB / name
 			if not subdir.is_dir():
 				errors.append(f"missing expected directory: {subdir}")
+		check_for_symlinks(SHARED_GITHUB, errors)
 
 	agent_names: Dict[str, Path] = {}
 
@@ -117,4 +124,3 @@ def main() -> int:
 
 if __name__ == "__main__":
 	raise SystemExit(main())
-

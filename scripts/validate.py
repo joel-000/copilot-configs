@@ -36,6 +36,29 @@ def extract_scalar(frontmatter: str, key: str) -> Optional[str]:
 	return match.group(1).strip().strip('"\'')
 
 
+def extract_indented_block(frontmatter: str, key: str) -> Optional[str]:
+	match = re.search(rf"^{re.escape(key)}:\s*\n((?:[ \t].*(?:\n|$))*)", frontmatter, re.M)
+	if not match:
+		return None
+	return match.group(1)
+
+
+def extract_handoff_agents(frontmatter: str) -> List[str]:
+	block = extract_indented_block(frontmatter, "handoffs")
+	if not block:
+		return []
+	return [
+		value.strip().strip('"\'')
+		for value in re.findall(r"^\s+agent:\s*(.+)$", block, re.M)
+	]
+
+
+def count_yaml_list_items(block: Optional[str]) -> int:
+	if not block:
+		return 0
+	return len(re.findall(r"^\s*-\s+", block, re.M))
+
+
 def check_required_keys(
 	path: Path, required_keys: Iterable[str], errors: List[str]
 ) -> Optional[Tuple[Set[str], str]]:
@@ -70,6 +93,8 @@ def main() -> int:
 		check_for_symlinks(SHARED_GITHUB, errors)
 
 	agent_names: Dict[str, Path] = {}
+	agent_ids: Dict[str, Path] = {}
+	agent_records: List[Tuple[Path, Set[str], str]] = []
 
 	agents_dir = SHARED_GITHUB / "agents"
 	if agents_dir.is_dir():
@@ -88,6 +113,19 @@ def main() -> int:
 				)
 				continue
 			agent_names[name] = path
+			agent_ids[path.name[: -len(".agent.md")]] = path
+			agent_records.append((path, _, frontmatter))
+
+	for path, keys, frontmatter in agent_records:
+		if "handoffs" not in keys:
+			continue
+		handoff_block = extract_indented_block(frontmatter, "handoffs")
+		handoff_agents = extract_handoff_agents(frontmatter)
+		if count_yaml_list_items(handoff_block) > len(handoff_agents):
+			errors.append(f"missing parseable handoff agent reference in {path}")
+		for agent in handoff_agents:
+			if agent not in agent_names and agent not in agent_ids:
+				errors.append(f"unknown handoff agent {agent!r} in {path}")
 
 	instructions_dir = SHARED_GITHUB / "instructions"
 	if instructions_dir.is_dir():

@@ -109,3 +109,30 @@ jobs:
           fi
 
           rm -f "$fixture_file"
+
+      - name: Ensure validator fails on broken handoff agent references
+        run: |
+          set -euo pipefail
+          fixture_file="shared/.github/agents/zz-regression-bad-handoff.agent.md"
+          cat > "$fixture_file" <<'EOF'
+          ---
+          name: 'Regression Handoff Fixture'
+          description: 'Intentionally invalid handoff target for validator regression checks'
+          tools: ['read']
+          handoffs:
+            - label: Broken handoff
+              agent: nonexistent-agent
+              prompt: 'This should fail validation.'
+              send: false
+          ---
+
+          This file intentionally contains an invalid handoff reference.
+          EOF
+
+          if python scripts/validate.py; then
+            echo "Expected validator failure, but it passed."
+            rm -f "$fixture_file"
+            exit 1
+          fi
+
+          rm -f "$fixture_file"

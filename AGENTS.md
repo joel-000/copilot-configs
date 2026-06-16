@@ -11,9 +11,10 @@
 - `scripts/validate.py` is the main integrity check. It validates:
   - required subdirectories exist
   - required frontmatter keys exist
+  - agent handoff `agent` references resolve to a real agent `name` or agent file ID
   - prompt `agent` references resolve to a real agent `name`
   - duplicate agent names are not introduced
-- Cross-file references are string-based. Example: `shared/.github/prompts/add-fastapi-endpoint.prompt.md` declares `agent: FastAPI API Agent`, which must exactly match an agent `name:` under `shared/.github/agents/`.
+- Cross-file references are string-based. Example: `shared/.github/prompts/add-fastapi-endpoint.prompt.md` declares `agent: FastAPI API Agent`, which must exactly match an agent `name:` under `shared/.github/agents/`. Agent handoffs may target either that display `name:` or the agent filename without `.agent.md`, such as `implementation-plan`.
 
 ## Frontmatter and file-shape conventions
 - Every managed artifact starts with YAML frontmatter at the top of the file.
@@ -22,7 +23,7 @@
   - instructions: `description`, `applyTo`
   - prompts: `name`, `description`, `agent`
   - skills: `name`, `description`
-- Keep scalar frontmatter simple and conventional. `scripts/validate.py` extracts fields like `name:` and `agent:` with regex, so unusual YAML formatting is riskier here than in parser-backed systems.
+- Keep scalar frontmatter simple and conventional. `scripts/validate.py` extracts fields like `name:`, prompt `agent:`, and handoff `agent:` values with regex, so unusual YAML formatting is riskier here than in parser-backed systems.
 - File discovery is naming-based:
   - `shared/.github/agents/*.agent.md`
   - `shared/.github/instructions/*.instructions.md`
@@ -61,4 +62,3 @@
 - In this workspace, `scripts/install.sh` is **not executable**, so invoke it as `bash scripts/install.sh ...` unless file permissions are changed.
 - There is no broader test suite or package manifest here; `scripts/validate.py` is the authoritative automated check.
 - `scripts/validate.py` currently uses tab indentation internally; avoid unrelated reformatting if you modify it.
-

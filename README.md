@@ -66,6 +66,7 @@ The validator currently checks:
 
 - expected `shared/.github/` subdirectories exist
 - required frontmatter keys exist on agents, instructions, prompts, and skills
+- agent handoff `agent` references resolve to real agent names or agent file IDs
 - prompt `agent` references resolve to real agent names
 - duplicate agent names are not introduced
 - symlink artifacts are rejected under `shared/.github/`
@@ -74,6 +75,7 @@ The validator currently checks:
 
 - Keep `shared/.github/` as the canonical source tree.
 - Prefer additive installs by default; only use `--prune` when you intend to remove unmanaged target files.
+- When adding or changing an agent handoff, validate that its `agent` value matches an agent `name` or agent filename without `.agent.md`.
 - When adding a new prompt, validate that its `agent` value exactly matches an agent `name`.
 - When adding a new configuration artifact, include complete frontmatter so the validator can enforce consistency.
 

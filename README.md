@@ -70,10 +70,13 @@ The validator currently checks:
 - prompt `agent` references resolve to real agent names
 - duplicate agent names are not introduced
 - symlink artifacts are rejected under `shared/.github/`
+- repository-level `.github/` agents, instructions, and prompts also keep valid frontmatter and internal references
+- overlapping root `.github/agents/` and `.github/prompts/` files stay in sync with their `shared/.github/` source counterparts
 
 ## Maintenance guidance
 
 - Keep `shared/.github/` as the canonical source tree.
+- Treat overlapping files under root `.github/agents/` and `.github/prompts/` as local mirrors of `shared/.github/`; update the shared copy first and keep them identical.
 - Prefer additive installs by default; only use `--prune` when you intend to remove unmanaged target files.
 - When adding or changing an agent handoff, validate that its `agent` value matches an agent `name` or agent filename without `.agent.md`.
 - When adding a new prompt, validate that its `agent` value exactly matches an agent `name`.

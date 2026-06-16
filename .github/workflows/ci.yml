@@ -8,14 +8,14 @@ on:
     paths:
       - "shared/.github/**"
       - "scripts/**"
-      - ".github/workflows/**"
+      - ".github/**"
   push:
     branches:
       - master
     paths:
       - "shared/.github/**"
       - "scripts/**"
-      - ".github/workflows/**"
+      - ".github/**"
   workflow_dispatch:
 
 jobs:

@@ -1,0 +1,38 @@
+name: Reusable Validate Pack
+
+permissions:
+  contents: read
+
+on:
+  workflow_call:
+
+jobs:
+  validate-pack:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Set up Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
+        with:
+          python-version: "3.x"
+
+      - name: Validate pack structure and references
+        run: python scripts/validate.py
+
+      - name: Scan for committed secrets
+        run: |
+          set -euo pipefail
+          if git --no-pager grep -nE "(ghp_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{20,}|AKIA[0-9A-Z]{16}|ASIA[0-9A-Z]{16}|-----BEGIN (RSA|OPENSSH|EC|DSA) PRIVATE KEY-----|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35})"; then
+            echo "Potential secret detected in tracked files."
+            exit 1
+          fi
+
+      - name: Check Python script syntax
+        run: python -m py_compile scripts/validate.py
+
+      - name: Check installer script syntax
+        run: |
+          bash -n scripts/repo_install.sh
+          bash -n scripts/pycharm_install.sh

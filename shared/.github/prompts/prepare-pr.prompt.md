@@ -15,5 +15,18 @@ Review the current change and prepare:
 
 Before final readiness, verify:
 
-- Quality Review gate status is pass or explicitly waived
-- Security Review gate status is pass or explicitly waived
+- Initial Quality Review gate (`quality-review(changes)`) is pass or explicitly waived
+- Initial Security Review gate (`security-review(changes)`) is pass or explicitly waived
+- Documentation completion is complete or explicitly waived
+- Final Quality Review gate (`quality-review(final)`) is pass or explicitly waived after the latest documentation edits
+- Final Security Review gate (`security-review(final)`) is pass or explicitly waived after the latest documentation edits
+- Freshness evidence confirms final quality/security decisions are newer than the latest content edits
+
+If any required precondition is missing, do not mark the PR as ready.
+
+If a waiver is used, include all of the following in the output:
+
+- Waiver owner
+- Accepted risk
+- Waiver scope
+- Waiver duration or waiver timestamp

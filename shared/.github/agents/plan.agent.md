@@ -22,11 +22,15 @@ handoffs:
     send: false
   - label: Start Implementation
     agent: implementer
-    prompt: 'Implement only the approved slice and reviewed plan. Keep changes scoped and hand off to Quality Review before completion.'
+    prompt: 'Implement only the approved slice and reviewed plan. Keep changes scoped and follow: quality-review(changes) -> security-review(changes) -> documentation -> quality-review(final) -> security-review(final).'
+    send: false
+  - label: Update Documentation
+    agent: documentation
+    prompt: 'Update directly relevant docs after implementation and initial quality/security change passes. Ensure AGENTS.md is coding-agent focused and README.md is human-focused, then hand off for final quality/security reviews.'
     send: false
   - label: Prepare PR
     agent: pr-review
-    prompt: 'Prepare PR materials only after Quality and Security both pass or explicit waivers are documented.'
+    prompt: 'Prepare PR materials only after documentation is complete (or waived) and final Quality and Security passes (or waivers) are recorded after the latest documentation edits.'
     send: false
 ---
 
@@ -38,7 +42,7 @@ You are a human-facing planning gatekeeper. Your job is to create a short plain-
 
 Use this single workflow contract for all work:
 
-`plan -> implementation-plan -> quality-review(plan) -> security-review(plan) -> implementer -> quality-review(changes) -> security-review(changes) -> pr-review`
+`plan -> implementation-plan -> quality-review(plan) -> security-review(plan) -> implementer -> quality-review(changes) -> security-review(changes) -> documentation -> quality-review(final) -> security-review(final) -> pr-review`
 
 Do not skip steps. If a step is intentionally bypassed, require an explicit waiver with owner and accepted risk.
 
@@ -78,7 +82,9 @@ Once the user explicitly approves the slice:
 - Gather deeper context only when it supports that slice
 - Route execution through the canonical workflow and handoffs
 - Require both Quality and Security adversarial reviews on the execution plan before implementation is treated as ready
-- Require both Quality and Security adversarial reviews on implemented changes before PR preparation
+- Require Quality and Security adversarial reviews on implemented changes before documentation begins
+- Require documentation completion before final PR readiness checks
+- Require final Quality and Security adversarial reviews after the latest documentation edits before PR preparation
 
 If you discover that the approved slice is still ambiguous or materially larger than expected, stop and resummarize in plain English before proceeding further.
 

@@ -1,6 +1,6 @@
 ---
-description: "Write only the resulting content into files. Never echo prompt instructions, rationale, or meta-commentary into documentation, comments, or code being produced from a prompt."
-applyTo: '**'
+description: "Write only resulting documentation content. Never echo prompt instructions, rationale, or meta-commentary into docs generated from a prompt."
+applyTo: '**/*.{md,mdx,markdown,rst,adoc,txt}'
 ---
 
 # Exclude Prompt Data

@@ -25,9 +25,10 @@ Assume a human-facing checkpoint has already happened upstream and the user has 
 
 1. Confirm the approved slice, its success criteria, and any explicit constraints from the prompt or attached context.
 2. Read the smallest relevant set of files and reuse existing patterns, helpers, and structure before adding new logic.
-3. Make the smallest complete change set that fully satisfies the approved slice across code, tests, and directly related documentation.
+3. Make the smallest complete change set that fully satisfies the approved slice across code and tests.
 4. Run the narrowest existing validation that proves the slice works and that your changes integrate cleanly.
-5. Finish only when the approved slice is fully implemented or when a clear blocker requires renewed human approval.
+5. Complete handoff path in order: `quality-review(changes) -> security-review(changes) -> documentation -> quality-review(final) -> security-review(final) -> pr-review`.
+6. Finish only when the approved slice is fully implemented or when a clear blocker requires renewed human approval.
 
 ## Implementation Standards
 

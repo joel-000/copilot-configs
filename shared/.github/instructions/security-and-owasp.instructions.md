@@ -1,6 +1,6 @@
 ---
-applyTo: '**'
-description: 'Comprehensive secure coding standards based on OWASP Top 10 2025, with 55+ anti-patterns, detection regex, framework-specific fixes for modern web and backend frameworks, and AI/LLM security guidance.'
+applyTo: '**/*.{js,jsx,ts,tsx,mjs,cjs,py,go,java,kt,kts,cs,rb,php,rs,swift,scala,sql,html,css,scss,sass,vue,svelte}'
+description: 'OWASP-aligned application security standards for backend/frontend source files, including anti-pattern detection and corrective coding guidance.'
 ---
 
 # Security Standards

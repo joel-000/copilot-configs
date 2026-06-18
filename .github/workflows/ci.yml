@@ -81,15 +81,29 @@ jobs:
           target="$(mktemp -d)"
           mkdir -p "$target/.github"
           printf "keep me\n" > "$target/.github/unmanaged-file.txt"
-          bash scripts/repo_install.sh --prune "$target"
+          bash scripts/repo_install.sh --prune --confirm-prune "$target"
           test ! -f "$target/.github/unmanaged-file.txt"
+
+      - name: Verify installer rejects symlinked .github targets
+        run: |
+          set -euo pipefail
+          target="$(mktemp -d)"
+          ln -s /tmp "$target/.github-link"
+          if bash scripts/repo_install.sh "$target/.github-link"; then
+            echo "Expected installer to reject symlinked .github target."
+            exit 1
+          fi
+          if bash scripts/repo_install.sh "$target/.github-link/"; then
+            echo "Expected installer to reject symlinked .github/ target with trailing slash."
+            exit 1
+          fi
 
       - name: Smoke test PyCharm installer links
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
           repo_root="$(pwd)"
-          bash scripts/pycharm_install.sh --copilot-home "$copilot_home"
+          bash scripts/pycharm_install.sh --allow-outside-home --copilot-home "$copilot_home"
           test -L "$copilot_home/instructions"
           test -L "$copilot_home/agents"
           test -L "$copilot_home/prompts"
@@ -103,9 +117,9 @@ jobs:
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
-          bash scripts/pycharm_install.sh --copilot-home "$copilot_home"
+          bash scripts/pycharm_install.sh --allow-outside-home --copilot-home "$copilot_home"
           first_snapshot="$(find "$copilot_home" -mindepth 1 -maxdepth 1 -printf '%f:%l\n' | sort)"
-          bash scripts/pycharm_install.sh --copilot-home "$copilot_home"
+          bash scripts/pycharm_install.sh --allow-outside-home --copilot-home "$copilot_home"
           second_snapshot="$(find "$copilot_home" -mindepth 1 -maxdepth 1 -printf '%f:%l\n' | sort)"
           test "$first_snapshot" = "$second_snapshot"
 
@@ -116,11 +130,11 @@ jobs:
           repo_root="$(pwd)"
           mkdir -p "$copilot_home/prompts"
           printf "stale prompt config\n" > "$copilot_home/prompts/old.txt"
-          if bash scripts/pycharm_install.sh --copilot-home "$copilot_home"; then
+          if bash scripts/pycharm_install.sh --allow-outside-home --copilot-home "$copilot_home"; then
             echo "Expected installer to fail when prompts path conflicts without --force."
             exit 1
           fi
-          bash scripts/pycharm_install.sh --copilot-home "$copilot_home" --force
+          bash scripts/pycharm_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
           test -L "$copilot_home/prompts"
           test "$(readlink "$copilot_home/prompts")" = "$repo_root/shared/.github/prompts"
 

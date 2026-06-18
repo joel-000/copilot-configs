@@ -32,6 +32,7 @@ Assume a human-facing checkpoint has already happened upstream and the user has 
 ## Implementation Standards
 
 - Follow repository conventions for naming, structure, validation, and minimal-diff edits.
+- Prioritize minimizing diffs for existing code: prefer surgical edits over rewrites so reviews and merges stay clean.
 - Keep changes precise, coherent, and complete across every affected surface inside the approved slice.
 - Preserve existing behavior outside the approved slice unless the approved work explicitly changes it.
 - Reuse existing abstractions before creating new ones.

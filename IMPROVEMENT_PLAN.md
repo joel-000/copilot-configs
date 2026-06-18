@@ -1,63 +1,63 @@
 # Copilot Config Suite Improvement Plan
 
 ## Goal
-Evolve this repository into a high-quality Copilot extension suite that works reliably across many project types, while keeping behavior predictable and maintainable.
+Keep this repository as a portable, high-signal Copilot configuration pack with predictable behavior, minimal accidental scope, and strong validation.
 
-## Prioritized Improvements
+## Current Baseline (Already Landed)
 
-1. **Split into profiles (core + domain packs)**
-   - Keep a lean universal core.
-   - Move stack-specific content (Python/FastAPI/AWS/Terraform) into optional packs.
+1. **Planning workflow split is implemented**
+   - Human-facing checkpoint lives in `shared/.github/agents/plan.agent.md`.
+   - Detailed internal planner lives in `shared/.github/agents/implementation-plan.agent.md`.
+   - Approved-slice flow is exposed via `shared/.github/prompts/plan-approved-slice.prompt.md`.
 
-2. **Reduce global instruction blast radius**
-   - Narrow `applyTo: '**'` usage in:
+2. **Installer and validation structure are modernized**
+   - Installer split into `scripts/repo_install.sh` and `scripts/pycharm_install.sh`.
+   - Validator checks source pack, root mirrors, references, and symlink constraints.
+
+## Updated Prioritized Improvements
+
+1. **Reduce global instruction blast radius**
+   - Replace broad `applyTo: '**'` in:
      - `shared/.github/instructions/exclude-prompt-data.instructions.md`
      - `shared/.github/instructions/security-and-owasp.instructions.md`
-   - Prefer focused instruction files by file type and workflow.
+   - Split into narrower, workflow/file-targeted instruction files.
 
-3. **Standardize agent tool declarations**
-   - Normalize tool naming/schema across all agents.
-   - Remove mixed legacy/namespaced tool patterns that can reduce portability.
+2. **Standardize agent tool declarations for portability**
+   - Normalize tools to one schema (for example: `read`, `edit`, `search`, `execute`, `web`, `agent`).
+   - Remove mixed aliases/patterns such as `terminal` and inconsistent namespaced forms.
 
-4. **Consolidate overlapping planning agents**
-   - Clarify or merge responsibilities between:
-     - `shared/.github/agents/plan.agent.md`
-     - `shared/.github/agents/implementation-plan.agent.md`
+3. **Harden the planning workflow rather than merging it**
+   - Keep the two-stage model.
+   - Add explicit UX verification criteria for approval checkpoint and handoff transitions.
+   - Tighten guardrails around approved-slice boundaries.
 
-5. **Strengthen underspecified agents and prompts**
-   - Expand short agents/prompts with explicit:
-     - assumptions
-     - constraints
-     - guardrails
-     - output contracts
-     - validation expectations
-
-6. **Upgrade skills to match skill standards**
-   - Improve discovery descriptions (WHAT + WHEN + KEYWORDS).
-   - Add/expand gotchas and troubleshooting where relevant.
+4. **Upgrade skill quality to repository standards**
    - Prioritize:
-     - `create-readme`
-     - `fastapi-endpoint-workflow`
-     - `pytest-unit-test-workflow`
-     - `terraform-plan-review`
+     - `shared/.github/skills/create-readme/SKILL.md`
+     - `shared/.github/skills/fastapi-endpoint-workflow/SKILL.md`
+     - `shared/.github/skills/pytest-unit-test-workflow/SKILL.md`
+     - `shared/.github/skills/terraform-plan-review/SKILL.md`
+   - Improve descriptions for discovery (WHAT + WHEN + KEYWORDS).
+   - Add/expand `Gotchas` and `Troubleshooting`.
+   - Break oversized skill docs into concise core + `references/` when needed.
 
-7. **Remove brittle or low-signal prompt language**
-   - Replace non-deterministic phrasing with clear operational instructions.
-   - Avoid hardcoded style references unless they are required by policy.
+5. **Strengthen prompt contracts**
+   - Add clearer preconditions, scope limits, and output contracts to short prompts.
+   - Remove low-signal wording and ambiguous phrasing.
 
-8. **Add universal, cross-stack coverage**
-   - Add core assets for common ecosystems and workflows:
+6. **Define root `.github` mirror strategy**
+   - Decide whether root `.github/` remains a manual mirror or becomes generated from `shared/.github/`.
+   - Enforce the chosen approach consistently via validation and repository conventions.
+
+7. **Add optional cross-stack profile coverage**
+   - Extend pack coverage with optional assets for:
      - JavaScript/TypeScript, Java, Go, C#, Rust
-     - CI triage
-     - dependency upgrades
-     - release note generation
-     - bug reproduction workflows
-     - migration planning
+     - CI triage, dependency upgrades, release notes, bug reproduction, migration planning
 
 ## Execution Strategy
 
-1. Build and lock a **core profile** first (minimal, safe defaults).
-2. Extract and version **domain profiles** second.
-3. Normalize frontmatter/tool schemas and revalidate.
-4. Expand coverage for missing ecosystems/workflows.
-5. Validate install behavior and quality after each phase.
+1. **Phase 1 (foundation):** Reduce global instruction scope and standardize agent tool declarations.
+2. **Phase 2 (quality):** Upgrade priority skills and prompt contracts.
+3. **Phase 3 (structure):** Finalize/enforce root mirror strategy.
+4. **Phase 4 (coverage):** Add optional cross-stack profile assets.
+5. Run `python scripts/validate.py` after each phase and keep `shared/.github/` as source of truth.

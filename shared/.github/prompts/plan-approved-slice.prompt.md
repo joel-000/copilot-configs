@@ -23,6 +23,12 @@ Start with the human-summary-first planning workflow.
 - Do not produce a full implementation plan before approval.
 - Do not start coding before approval.
 
+## Plan Readiness Gate
+
+- Before a detailed execution plan is treated as ready for implementation, require both Quality Review and Security Review outcomes on that plan.
+- If either review is blocked, return blockers and required corrections instead of reporting the plan as ready.
+- Any waiver must name the owner and accepted risk.
+
 ## Output Expectations
 
 - Keep the first response brief and easy to scan.

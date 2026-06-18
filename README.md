@@ -118,3 +118,25 @@ bash scripts/repo_install.sh /tmp/copilot-config-smoke-test
 ```
 
 Review the copied `.github/` tree in the smoke-test directory before distributing the update more broadly.
+
+## Multi-agent demo runbook
+
+### Safe workflow order
+
+1. Start with plan-approved-slice prompt.
+2. Confirm approved slice before implementation.
+3. Run `python scripts/validate.py`.
+4. Run `bash scripts/repo_install.sh <smoke-test-dir>` without `--prune`.
+5. Review installed `.github` tree before broader rollout.
+
+### Acceptance criteria
+
+- [ ] **Pass:** Prompt explicitly uses a plan-approved slice. **Fail:** Prompt is broad or unscoped.
+- [ ] **Pass:** Implementation confirms the approved slice before edits. **Fail:** Work starts without scope confirmation.
+- [ ] **Pass:** `python scripts/validate.py` exits successfully. **Fail:** Validator reports any error.
+- [ ] **Pass:** `bash scripts/repo_install.sh <smoke-test-dir>` runs without `--prune` and completes successfully. **Fail:** Install fails or uses prune mode.
+- [ ] **Pass:** Smoke-test `.github` tree is reviewed before wider rollout. **Fail:** No review checkpoint is recorded.
+
+### Rollback note
+
+If changes are not yet committed, use `git restore --staged --worktree README.md` to discard both staged and unstaged edits. If already committed, use `git revert <commit>` to create a safe rollback commit.

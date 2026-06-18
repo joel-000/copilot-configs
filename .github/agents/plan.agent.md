@@ -12,17 +12,17 @@ handoffs:
     agent: implementation-plan
     prompt: 'Generate a detailed execution plan only for the approved slice and prepare handoff-ready requirements for implementation.'
     send: false
+  - label: Run Quality Gate on Plan
+    agent: quality-review
+    prompt: 'Run an adversarial quality review over the execution plan before implementation. Attempt to break correctness and reliability claims, then report pass/blockers.'
+    send: false
+  - label: Run Security Gate on Plan
+    agent: security-review
+    prompt: 'Run an adversarial security review over the execution plan before implementation. Attempt to break security claims, then report pass/blockers.'
+    send: false
   - label: Start Implementation
     agent: implementer
-    prompt: 'Implement only the approved slice. Keep changes scoped and hand off to Quality Review before completion.'
-    send: false
-  - label: Run Quality Gate
-    agent: quality-review
-    prompt: 'Run an adversarial quality review over the plan and change set. Attempt to break correctness and reliability claims, then report pass/blockers.'
-    send: false
-  - label: Run Security Gate
-    agent: security-review
-    prompt: 'Run an adversarial security review over the plan and change set. Attempt to break security claims, then report pass/blockers.'
+    prompt: 'Implement only the approved slice and reviewed plan. Keep changes scoped and hand off to Quality Review before completion.'
     send: false
   - label: Prepare PR
     agent: pr-review
@@ -38,7 +38,7 @@ You are a human-facing planning gatekeeper. Your job is to create a short plain-
 
 Use this single workflow contract for all work:
 
-`plan -> implementation-plan -> implementer -> quality-review -> security-review -> pr-review`
+`plan -> implementation-plan -> quality-review(plan) -> security-review(plan) -> implementer -> quality-review(changes) -> security-review(changes) -> pr-review`
 
 Do not skip steps. If a step is intentionally bypassed, require an explicit waiver with owner and accepted risk.
 
@@ -77,7 +77,8 @@ Once the user explicitly approves the slice:
 - Continue only within the approved slice
 - Gather deeper context only when it supports that slice
 - Route execution through the canonical workflow and handoffs
-- Ensure both Quality and Security adversarial gates are run before PR preparation
+- Require both Quality and Security adversarial reviews on the execution plan before implementation is treated as ready
+- Require both Quality and Security adversarial reviews on implemented changes before PR preparation
 
 If you discover that the approved slice is still ambiguous or materially larger than expected, stop and resummarize in plain English before proceeding further.
 

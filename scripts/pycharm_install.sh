@@ -12,7 +12,6 @@ Create user-level symlinks for Copilot config directories used by PyCharm.
 
 - --copilot-home sets the base directory (default: ~/.copilot).
 - --force replaces conflicting files, directories, or symlinks.
-- Prompts are intentionally skipped because there is no global prompts directory.
 EOF
 }
 
@@ -92,7 +91,7 @@ link_directory() {
   echo "Replaced path ${target_dir} -> ${source_dir}"
 }
 
-for category in instructions agents skills; do
+for category in instructions agents prompts skills; do
   source_dir="${SOURCE_GITHUB}/${category}"
   target_dir="${COPILOT_HOME}/${category}"
   if [[ ! -d "${source_dir}" ]]; then

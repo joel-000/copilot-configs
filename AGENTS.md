@@ -8,7 +8,7 @@
 ## Architecture and data flow
 - `scripts/repo_install.sh` copies `shared/.github/` into a target repository’s `.github/` directory using `rsync`.
 - Default repo install mode is **safe merge**. `--prune` adds `rsync --delete` for exact mirroring, which can remove unmanaged target files.
-- `scripts/pycharm_install.sh` creates user-level symlinks for `instructions`, `agents`, and `skills` under `~/.copilot/` and intentionally skips prompts.
+- `scripts/pycharm_install.sh` creates user-level symlinks for `instructions`, `agents`, `prompts`, and `skills` under `~/.copilot/`.
 - `scripts/validate.py` is the main integrity check. It validates:
   - required subdirectories exist
   - required frontmatter keys exist

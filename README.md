@@ -73,9 +73,8 @@ This links:
 
 - `~/.copilot/instructions` -> `shared/.github/instructions`
 - `~/.copilot/agents` -> `shared/.github/agents`
+- `~/.copilot/prompts` -> `shared/.github/prompts`
 - `~/.copilot/skills` -> `shared/.github/skills`
-
-Prompts are intentionally skipped because there is no global prompts directory.
 
 Show help:
 

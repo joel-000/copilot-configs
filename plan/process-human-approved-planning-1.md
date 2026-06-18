@@ -70,7 +70,7 @@ Add a two-layer planning workflow to the config pack so humans get a short plain
 | -------- | ----------- | --------- | ---- |
 | TASK-011 | Add `shared/.github/prompts/plan-approved-slice.prompt.md` to steer users into the human-summary-first workflow instead of directly invoking the machine-oriented planner. | ✅ | 2026-06-16 |
 | TASK-012 | Verify all agent names, handoff references, and prompt `agent` references resolve correctly under `scripts/validate.py`. | ✅ | 2026-06-16 |
-| TASK-013 | Smoke-test installation with `bash scripts/install.sh /tmp/copilot-config-smoke-test` and confirm the new files land under `.github/` as expected. | ✅ | 2026-06-16 |
+| TASK-013 | Smoke-test installation with `bash scripts/repo_install.sh /tmp/copilot-config-smoke-test` and confirm the new files land under `.github/` as expected. | ✅ | 2026-06-16 |
 | TASK-014 | Manually verify the user experience in VS Code: concise human checkpoint first, visible handoff pause, detailed execution plan available after approval, and implementation constrained to the approved slice. |  |  |
 
 Interactive VS Code verification is still required for TASK-014 because the CLI session can validate the configuration and install output, but it cannot exercise the chat UI directly.
@@ -98,7 +98,7 @@ Interactive VS Code verification is still required for TASK-014 because the CLI 
 ## 6. Testing
 
 - **TEST-001**: Run `python scripts/validate.py` and confirm the pack validates successfully.
-- **TEST-002**: Run `bash scripts/install.sh /tmp/copilot-config-smoke-test` and confirm the new artifacts install into `.github/` correctly.
+- **TEST-002**: Run `bash scripts/repo_install.sh /tmp/copilot-config-smoke-test` and confirm the new artifacts install into `.github/` correctly.
 - **TEST-003**: In VS Code, verify that the planning agent's first response is brief, plain English, and asks for approval or correction before deeper work.
 - **TEST-004**: In VS Code, verify the handoff to the implementation-plan agent does not auto-send and allows user review first.
 - **TEST-005**: In VS Code, verify the implementation-plan agent can still emit a detailed multi-step plan suitable for downstream agent execution.

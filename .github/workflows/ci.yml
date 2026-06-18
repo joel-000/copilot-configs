@@ -45,7 +45,9 @@ jobs:
         run: python -m py_compile scripts/validate.py
 
       - name: Check installer script syntax
-        run: bash -n scripts/install.sh
+        run: |
+          bash -n scripts/repo_install.sh
+          bash -n scripts/pycharm_install.sh
 
   test-installer:
     runs-on: ubuntu-latest
@@ -57,7 +59,7 @@ jobs:
         run: |
           set -euo pipefail
           target="$(mktemp -d)"
-          bash scripts/install.sh "$target"
+          bash scripts/repo_install.sh "$target"
           test -d "$target/.github/agents"
           test -d "$target/.github/instructions"
           test -d "$target/.github/prompts"
@@ -67,9 +69,9 @@ jobs:
         run: |
           set -euo pipefail
           target="$(mktemp -d)"
-          bash scripts/install.sh "$target"
+          bash scripts/repo_install.sh "$target"
           first_checksum="$(tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner -cf - -C "$target/.github" . | sha256sum | cut -d' ' -f1)"
-          bash scripts/install.sh "$target"
+          bash scripts/repo_install.sh "$target"
           second_checksum="$(tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner -cf - -C "$target/.github" . | sha256sum | cut -d' ' -f1)"
           test "$first_checksum" = "$second_checksum"
 
@@ -79,8 +81,31 @@ jobs:
           target="$(mktemp -d)"
           mkdir -p "$target/.github"
           printf "keep me\n" > "$target/.github/unmanaged-file.txt"
-          bash scripts/install.sh --prune "$target"
+          bash scripts/repo_install.sh --prune "$target"
           test ! -f "$target/.github/unmanaged-file.txt"
+
+      - name: Smoke test PyCharm installer links
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          repo_root="$(pwd)"
+          bash scripts/pycharm_install.sh --copilot-home "$copilot_home"
+          test -L "$copilot_home/instructions"
+          test -L "$copilot_home/agents"
+          test -L "$copilot_home/skills"
+          test "$(readlink "$copilot_home/instructions")" = "$repo_root/shared/.github/instructions"
+          test "$(readlink "$copilot_home/agents")" = "$repo_root/shared/.github/agents"
+          test "$(readlink "$copilot_home/skills")" = "$repo_root/shared/.github/skills"
+
+      - name: Verify PyCharm installer idempotency
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          bash scripts/pycharm_install.sh --copilot-home "$copilot_home"
+          first_snapshot="$(find "$copilot_home" -mindepth 1 -maxdepth 1 -printf '%f:%l\n' | sort)"
+          bash scripts/pycharm_install.sh --copilot-home "$copilot_home"
+          second_snapshot="$(find "$copilot_home" -mindepth 1 -maxdepth 1 -printf '%f:%l\n' | sort)"
+          test "$first_snapshot" = "$second_snapshot"
 
   validator-regression:
     runs-on: ubuntu-latest

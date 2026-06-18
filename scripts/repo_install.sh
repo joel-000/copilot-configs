@@ -6,7 +6,7 @@ SOURCE_GITHUB="${SOURCE_ROOT}/shared/.github"
 
 usage() {
   cat <<'EOF'
-Usage: scripts/install.sh [--prune] [TARGET]
+Usage: scripts/repo_install.sh [--prune] [TARGET]
 
 Install the shared Copilot configuration pack into TARGET.
 

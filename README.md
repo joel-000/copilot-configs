@@ -14,7 +14,8 @@ The source of truth lives under `shared/.github/` and mirrors the destination la
 | `shared/.github/instructions/` | Reusable instruction files scoped by file type or workflow |
 | `shared/.github/prompts/` | Prompt entry points wired to specific agents |
 | `shared/.github/skills/` | Reusable skills for common workflows |
-| `scripts/install.sh` | Installer that copies the pack into a repository |
+| `scripts/repo_install.sh` | Installer that copies the pack into a repository |
+| `scripts/pycharm_install.sh` | Installer that links the pack into user-level PyCharm Copilot directories |
 | `scripts/validate.py` | Validation script for frontmatter, references, and layout |
 
 ## Repository layout
@@ -28,30 +29,58 @@ shared/
 	└── skills/
 ```
 
-## Install
+## Install into a repository
 
-By default, the installer performs a safe merge and does not delete existing files in the target repository.
+By default, the repository installer performs a safe merge and does not delete existing files in the target repository.
 
 ```bash
-./scripts/install.sh /path/to/repository
+bash scripts/repo_install.sh /path/to/repository
 ```
 
 You can also target a `.github` directory directly:
 
 ```bash
-./scripts/install.sh /path/to/repository/.github
+bash scripts/repo_install.sh /path/to/repository/.github
 ```
 
 If you want the target tree to exactly mirror this pack, use prune mode explicitly:
 
 ```bash
-./scripts/install.sh --prune /path/to/repository
+bash scripts/repo_install.sh --prune /path/to/repository
 ```
 
 Show help:
 
 ```bash
-./scripts/install.sh --help
+bash scripts/repo_install.sh --help
+```
+
+## Install globally for PyCharm
+
+Create user-level symlinks so all PyCharm projects immediately use this repository's current shared config.
+
+```bash
+bash scripts/pycharm_install.sh
+```
+
+You can override the base path and force replacement of conflicting paths:
+
+```bash
+bash scripts/pycharm_install.sh --copilot-home /custom/copilot/home --force
+```
+
+This links:
+
+- `~/.copilot/instructions` -> `shared/.github/instructions`
+- `~/.copilot/agents` -> `shared/.github/agents`
+- `~/.copilot/skills` -> `shared/.github/skills`
+
+Prompts are intentionally skipped because there is no global prompts directory.
+
+Show help:
+
+```bash
+bash scripts/pycharm_install.sh --help
 ```
 
 ## Validate this pack
@@ -86,7 +115,7 @@ The validator currently checks:
 
 ```bash
 python scripts/validate.py
-./scripts/install.sh /tmp/copilot-config-smoke-test
+bash scripts/repo_install.sh /tmp/copilot-config-smoke-test
 ```
 
 Review the copied `.github/` tree in the smoke-test directory before distributing the update more broadly.

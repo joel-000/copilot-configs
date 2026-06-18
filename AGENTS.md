@@ -6,8 +6,9 @@
 - The enforced pack layout is `shared/.github/{agents,instructions,prompts,skills}`. `scripts/validate.py` assumes exactly these categories.
 
 ## Architecture and data flow
-- `scripts/install.sh` copies `shared/.github/` into a target repository’s `.github/` directory using `rsync`.
-- Default install mode is **safe merge**. `--prune` adds `rsync --delete` for exact mirroring, which can remove unmanaged target files.
+- `scripts/repo_install.sh` copies `shared/.github/` into a target repository’s `.github/` directory using `rsync`.
+- Default repo install mode is **safe merge**. `--prune` adds `rsync --delete` for exact mirroring, which can remove unmanaged target files.
+- `scripts/pycharm_install.sh` creates user-level symlinks for `instructions`, `agents`, and `skills` under `~/.copilot/` and intentionally skips prompts.
 - `scripts/validate.py` is the main integrity check. It validates:
   - required subdirectories exist
   - required frontmatter keys exist
@@ -46,19 +47,20 @@
   ```
 - Smoke-test installation after structural changes:
   ```bash
-  bash scripts/install.sh /tmp/copilot-config-smoke-test
+  bash scripts/repo_install.sh /tmp/copilot-config-smoke-test
   ```
 - For exact-mirror behavior during a smoke test:
   ```bash
-  bash scripts/install.sh --prune /tmp/copilot-config-smoke-test
+  bash scripts/repo_install.sh --prune /tmp/copilot-config-smoke-test
   ```
 - Check installer usage:
   ```bash
-  bash scripts/install.sh --help
+  bash scripts/repo_install.sh --help
+  bash scripts/pycharm_install.sh --help
   ```
 
 ## Project-specific gotchas
-- `scripts/install.sh` depends on `rsync` being available.
-- In this workspace, `scripts/install.sh` is **not executable**, so invoke it as `bash scripts/install.sh ...` unless file permissions are changed.
+- `scripts/repo_install.sh` depends on `rsync` being available.
+- In this workspace, installer scripts are **not executable**, so invoke them as `bash scripts/<script>.sh ...` unless file permissions are changed.
 - There is no broader test suite or package manifest here; `scripts/validate.py` is the authoritative automated check.
 - `scripts/validate.py` currently uses tab indentation internally; avoid unrelated reformatting if you modify it.

@@ -1,7 +1,7 @@
 ---
 name: review-terraform-plan
 description: Review Terraform changes or plan output for AWS risk.
-agent: Terraform IaC Reviewer
+agent: Platform Infrastructure Agent
 ---
 
 Review the Terraform change or plan output.

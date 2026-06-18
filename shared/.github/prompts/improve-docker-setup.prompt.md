@@ -1,7 +1,7 @@
 ---
 name: improve-docker-setup
 description: Improve Dockerfiles and Compose config for security, image size, and modern build practices.
-agent: Docker Specialist
+agent: Platform Infrastructure Agent
 ---
 
 Improve this repository's container setup.

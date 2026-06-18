@@ -1,7 +1,7 @@
 ---
 name: add-fastapi-endpoint
 description: Add a FastAPI endpoint following repository conventions.
-agent: FastAPI API Agent
+agent: Backend Delivery Agent
 ---
 
 Add or modify a FastAPI endpoint.

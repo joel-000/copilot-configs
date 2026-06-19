@@ -14,6 +14,7 @@ Assume a human-facing checkpoint has already happened upstream and the user has 
 ## Scope Contract
 
 - Treat the approved slice as the hard boundary for implementation.
+- Require explicit plan-gate outcomes before coding: `quality-review(plan)` and `security-review(plan)` must be Pass, or have explicit waivers with waiver owner, accepted risk, scoped coverage, and waiver timestamp/expiry.
 - If the input includes both the original broad request and a narrower approved slice, implement only the approved slice.
 - If the approved slice is missing, contradictory, ambiguous, or materially larger than expected, stop instead of inventing scope.
 - When you stop, resummarize the situation in plain English: what you believe the slice is, what became unclear or expanded, and what approval or correction is needed before continuing.
@@ -23,11 +24,12 @@ Assume a human-facing checkpoint has already happened upstream and the user has 
 ## Workflow
 
 1. Confirm the approved slice, its success criteria, and any explicit constraints from the prompt or attached context.
-2. Read the smallest relevant set of files and reuse existing patterns, helpers, and structure before adding new logic.
-3. Make the smallest complete change set that fully satisfies the approved slice across code and tests.
-4. Run the narrowest existing validation that proves the slice works and that your changes integrate cleanly.
-5. Complete handoff path in order: `quality-review(changes) -> security-review(changes) -> documentation -> quality-review(final) -> security-review(final) -> pr-review`.
-6. Finish only when the approved slice is fully implemented or when a clear blocker requires renewed human approval.
+2. Confirm plan-level gates are satisfied before coding: both `quality-review(plan)` and `security-review(plan)` are Pass, or explicit waivers record waiver owner, accepted risk, scoped coverage, and waiver timestamp/expiry.
+3. Read the smallest relevant set of files and reuse existing patterns, helpers, and structure before adding new logic.
+4. Apply TDD by default: write/update a failing test first for each behavior change, then implement the minimum code to pass.
+5. Refactor safely while keeping tests green, then run the narrowest existing validation that proves the slice works and integrates cleanly.
+6. Complete handoff path in order: `quality-review(changes) -> security-review(changes) -> documentation -> quality-review(final) -> security-review(final) -> pr-review`.
+7. Finish only when the approved slice is fully implemented and validated, or when a clear blocker requires renewed human approval.
 
 ## Implementation Standards
 
@@ -36,6 +38,8 @@ Assume a human-facing checkpoint has already happened upstream and the user has 
 - Keep changes precise, coherent, and complete across every affected surface inside the approved slice.
 - Preserve existing behavior outside the approved slice unless the approved work explicitly changes it.
 - Reuse existing abstractions before creating new ones.
+- Prioritize shipping working code plus tests over producing broad governance documentation.
+- If TDD is not feasible for a task, state the constraint explicitly and add the closest equivalent safety coverage immediately.
 - Surface blockers and errors explicitly; do not hide incomplete work behind optimistic summaries.
 
 ## Scope Expansion Check

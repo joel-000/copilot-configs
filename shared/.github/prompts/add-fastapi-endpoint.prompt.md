@@ -1,15 +1,14 @@
 ---
 name: add-fastapi-endpoint
 description: Add a FastAPI endpoint following repository conventions.
-agent: Backend Delivery Agent
+agent: 'Plan Mode - Strategic Planning & Architecture'
 ---
 
-Add or modify a FastAPI endpoint.
+Plan and deliver a FastAPI endpoint change using the full workflow.
 
 Steps:
-1. Inspect existing routers, schemas, services and tests.
-2. Propose the minimal file changes.
-3. Implement the endpoint.
-4. Add pytest tests.
-5. State the exact test command to run.
-6. Summarise files changed and risks.
+1. Start with the approval checkpoint (goal, uncertainty, smallest slice, explicit approval request).
+2. After approval, generate a scoped execution plan for the endpoint change with TDD as default.
+3. Run `quality-review(plan)` and `security-review(plan)`; do not start implementation until both pass or explicit waivers are recorded (owner + accepted risk).
+4. After plan gates pass, ask the user to switch to Backend Delivery Agent to implement the approved slice with TDD (`failing test -> implementation -> pass/refactor`).
+5. Continue normal post-change gates and scoped documentation updates.

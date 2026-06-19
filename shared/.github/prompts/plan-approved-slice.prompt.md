@@ -16,6 +16,7 @@ Start with the human-summary-first planning workflow.
 2. Surface the biggest uncertainty or assumption.
 3. Propose the smallest useful next slice.
 4. Ask for approval or correction before deeper planning or coding.
+5. Treat planning requests as non-approval until the user explicitly approves the slice.
 
 ## Scope & Preconditions
 
@@ -27,7 +28,8 @@ Start with the human-summary-first planning workflow.
 
 - Before a detailed execution plan is treated as ready for implementation, require both Quality Review and Security Review outcomes on that plan.
 - If either review is blocked, return blockers and required corrections instead of reporting the plan as ready.
-- Any waiver must name the owner and accepted risk.
+- Any waiver must include waiver owner, accepted risk, scoped coverage, and waiver timestamp/expiry.
+- Keep plans execution-first: prioritize concrete code-change steps and testing, with TDD as the default implementation model.
 
 ## Output Expectations
 

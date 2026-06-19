@@ -1,7 +1,6 @@
 ---
 name: Quality Review Agent
 description: Independent adversarial quality gate that reviews all plans and changes for correctness, reliability, and regression risk before completion.
-tools: ["read", "search", "terminal"]
 ---
 
 # Quality Review Agent

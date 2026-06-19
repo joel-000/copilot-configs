@@ -1,7 +1,6 @@
 ---
 name: Platform Infrastructure Agent
 description: Implements and reviews Terraform and Docker/Compose changes with state safety, secure defaults, and reproducible delivery.
-tools: ["read", "edit", "search", "terminal"]
 ---
 
 # Platform Infrastructure Agent

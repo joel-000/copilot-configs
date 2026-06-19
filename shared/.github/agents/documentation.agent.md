@@ -1,7 +1,6 @@
 ---
 name: Documentation Agent
 description: Updates scoped documentation after implementation and initial quality/security passes, then prepares for final gate rechecks.
-tools: ["read", "edit", "search", "terminal"]
 ---
 
 # Documentation Agent

@@ -1,12 +1,6 @@
 ---
 description: 'Human-facing planning gatekeeper that summarizes the request, surfaces the biggest uncertainty, and waits for approval before deeper planning or coding.'
 name: 'Plan Mode - Strategic Planning & Architecture'
-tools:
-  - search/codebase
-  - web/fetch
-  - read/problems
-  - search/searchResults
-  - search/usages
 handoffs:
   - label: Generate Execution Plan
     agent: implementation-plan

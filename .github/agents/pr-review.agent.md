@@ -1,7 +1,6 @@
 ---
 name: PR Review Agent
 description: Final PR-readiness reviewer that prepares title, summary, risks, and checklist after required quality, security, and documentation gates.
-tools: ["read", "search", "terminal"]
 ---
 
 # PR Review Agent

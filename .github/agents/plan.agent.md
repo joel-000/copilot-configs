@@ -10,7 +10,7 @@ tools:
 handoffs:
   - label: Generate Execution Plan
     agent: implementation-plan
-    prompt: 'Generate a detailed execution plan only for the approved slice and prepare handoff-ready requirements for implementation.'
+    prompt: 'Generate a detailed execution plan only for the approved slice. Prioritize implementation steps and TDD-first testing over governance documentation.'
     send: false
   - label: Run Quality Gate on Plan
     agent: quality-review
@@ -20,13 +20,9 @@ handoffs:
     agent: security-review
     prompt: 'Run an adversarial security review over the execution plan before implementation. Attempt to break security claims, then report pass/blockers.'
     send: false
-  - label: Start Implementation
-    agent: implementer
-    prompt: 'Implement only the approved slice and reviewed plan. Keep changes scoped and follow: quality-review(changes) -> security-review(changes) -> documentation -> quality-review(final) -> security-review(final).'
-    send: false
   - label: Update Documentation
     agent: documentation
-    prompt: 'Update directly relevant docs after implementation and initial quality/security change passes. Ensure AGENTS.md is coding-agent focused and README.md is human-focused, then hand off for final quality/security reviews.'
+    prompt: 'Update only directly impacted documentation after implementation and initial quality/security change passes. Avoid broad governance rewrites.'
     send: false
   - label: Prepare PR
     agent: pr-review
@@ -42,7 +38,7 @@ You are a human-facing planning gatekeeper. Your job is to create a short plain-
 
 Use this single workflow contract for all work:
 
-`plan -> implementation-plan -> quality-review(plan) -> security-review(plan) -> implementer -> quality-review(changes) -> security-review(changes) -> documentation -> quality-review(final) -> security-review(final) -> pr-review`
+`plan -> implementation-plan -> quality-review(plan) -> security-review(plan) -> implementer(TDD default) -> quality-review(changes) -> security-review(changes) -> documentation(scoped/minimal) -> quality-review(final) -> security-review(final) -> pr-review`
 
 Do not skip steps. If a step is intentionally bypassed, require an explicit waiver with owner and accepted risk.
 
@@ -72,6 +68,8 @@ Before the user approves the slice, do not:
 - Ask downstream agents to plan or implement
 - Expand the request from a narrow slice into a full end-to-end project
 
+A user asking for planning is not implementation approval. Require an explicit approval signal for the slice before starting implementation.
+
 If the user corrects your understanding, reset and provide a new checkpoint in the same first-response shape.
 
 ## After Approval
@@ -81,7 +79,10 @@ Once the user explicitly approves the slice:
 - Continue only within the approved slice
 - Gather deeper context only when it supports that slice
 - Route execution through the canonical workflow and handoffs
+- Prioritize implementation and tests over governance-heavy plan artifacts
+- Treat TDD as default for implementation: failing test first, then implementation, then passing tests/refactor
 - Require both Quality and Security adversarial reviews on the execution plan before implementation is treated as ready
+- Do not hand off to implementation until both plan-level reviews are Pass, or explicit waivers record owner and accepted risk
 - Require Quality and Security adversarial reviews on implemented changes before documentation begins
 - Require documentation completion before final PR readiness checks
 - Require final Quality and Security adversarial reviews after the latest documentation edits before PR preparation

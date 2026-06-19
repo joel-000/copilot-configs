@@ -165,7 +165,11 @@ def validate_skills_dir(skills_dir: Path, errors: List[str]) -> None:
 
 
 def check_root_mirrors(root_github: Path, shared_github: Path, errors: List[str]) -> None:
-	for subdir, pattern in (("agents", "*.agent.md"), ("prompts", "*.prompt.md")):
+	for subdir, pattern in (
+		("agents", "*.agent.md"),
+		("prompts", "*.prompt.md"),
+		("instructions", "*.instructions.md"),
+	):
 		root_dir = root_github / subdir
 		shared_dir = shared_github / subdir
 		if not root_dir.is_dir() or not shared_dir.is_dir():

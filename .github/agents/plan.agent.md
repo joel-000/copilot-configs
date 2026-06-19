@@ -40,7 +40,7 @@ Use this single workflow contract for all work:
 
 `plan -> implementation-plan -> quality-review(plan) -> security-review(plan) -> implementer(TDD default) -> quality-review(changes) -> security-review(changes) -> documentation(scoped/minimal) -> quality-review(final) -> security-review(final) -> pr-review`
 
-Do not skip steps. If a step is intentionally bypassed, require an explicit waiver with owner and accepted risk.
+Do not skip steps. If a step is intentionally bypassed, require an explicit waiver with waiver owner, accepted risk, scoped coverage, and waiver timestamp/expiry.
 
 ## Primary Directive
 
@@ -82,7 +82,7 @@ Once the user explicitly approves the slice:
 - Prioritize implementation and tests over governance-heavy plan artifacts
 - Treat TDD as default for implementation: failing test first, then implementation, then passing tests/refactor
 - Require both Quality and Security adversarial reviews on the execution plan before implementation is treated as ready
-- Do not hand off to implementation until both plan-level reviews are Pass, or explicit waivers record owner and accepted risk
+- Do not hand off to implementation until both plan-level reviews are Pass, or explicit waivers record waiver owner, accepted risk, scoped coverage, and waiver timestamp/expiry
 - Require Quality and Security adversarial reviews on implemented changes before documentation begins
 - Require documentation completion before final PR readiness checks
 - Require final Quality and Security adversarial reviews after the latest documentation edits before PR preparation

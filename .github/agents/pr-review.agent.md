@@ -26,7 +26,8 @@ Waivers are valid only when they include:
 - waiver owner
 - accepted risk
 - scoped coverage (what is being waived)
-- timestamp or expiry
+- waiver timestamp in ISO-8601 UTC format (`YYYY-MM-DDTHH:MM:SSZ`)
+- optional waiver expiry in ISO-8601 UTC format (`YYYY-MM-DDTHH:MM:SSZ`) or `none`
 
 If any precondition is missing, do not mark the PR as ready.
 

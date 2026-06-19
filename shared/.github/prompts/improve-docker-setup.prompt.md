@@ -17,4 +17,4 @@ Workflow requirements:
 1. Start with approval checkpoint and explicit slice sign-off.
 2. Generate a scoped execution plan with TDD-style validation defaults where supported.
 3. Run `quality-review(plan)` and `security-review(plan)` before implementation; require both pass or explicit waivers (owner + accepted risk).
-4. Hand off to Platform Infrastructure Agent for approved implementation only after plan gates pass.
+4. After plan gates pass, ask the user to switch to Platform Infrastructure Agent for approved implementation.

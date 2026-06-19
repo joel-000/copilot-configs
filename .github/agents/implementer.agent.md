@@ -15,7 +15,7 @@ Assume a human-facing checkpoint has already happened upstream and the user has 
 ## Scope Contract
 
 - Treat the approved slice as the hard boundary for implementation.
-- Require explicit plan-gate outcomes before coding: `quality-review(plan)` and `security-review(plan)` must be Pass, or have explicit waivers naming owner and accepted risk.
+- Require explicit plan-gate outcomes before coding: `quality-review(plan)` and `security-review(plan)` must be Pass, or have explicit waivers with waiver owner, accepted risk, scoped coverage, and waiver timestamp/expiry.
 - If the input includes both the original broad request and a narrower approved slice, implement only the approved slice.
 - If the approved slice is missing, contradictory, ambiguous, or materially larger than expected, stop instead of inventing scope.
 - When you stop, resummarize the situation in plain English: what you believe the slice is, what became unclear or expanded, and what approval or correction is needed before continuing.
@@ -25,7 +25,7 @@ Assume a human-facing checkpoint has already happened upstream and the user has 
 ## Workflow
 
 1. Confirm the approved slice, its success criteria, and any explicit constraints from the prompt or attached context.
-2. Confirm plan-level gates are satisfied before coding: both `quality-review(plan)` and `security-review(plan)` are Pass, or explicit waivers record owner and accepted risk.
+2. Confirm plan-level gates are satisfied before coding: both `quality-review(plan)` and `security-review(plan)` are Pass, or explicit waivers record waiver owner, accepted risk, scoped coverage, and waiver timestamp/expiry.
 3. Read the smallest relevant set of files and reuse existing patterns, helpers, and structure before adding new logic.
 4. Apply TDD by default: write/update a failing test first for each behavior change, then implement the minimum code to pass.
 5. Refactor safely while keeping tests green, then run the narrowest existing validation that proves the slice works and integrates cleanly.

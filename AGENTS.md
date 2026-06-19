@@ -20,7 +20,7 @@
 ## Frontmatter and file-shape conventions
 - Every managed artifact starts with YAML frontmatter at the top of the file.
 - Required keys by artifact type:
-  - agents: `name`, `description`, `tools`
+  - agents: `name`, `description`
   - instructions: `description`, `applyTo`
   - prompts: `name`, `description`, `agent`
   - skills: `name`, `description`

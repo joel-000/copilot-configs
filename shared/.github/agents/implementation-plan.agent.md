@@ -1,7 +1,6 @@
 ---
 description: 'Internal execution planner that turns an already approved slice of work into a detailed multi-step implementation plan for downstream agents.'
 name: 'Implementation Plan Generation Mode'
-tools: ["search/codebase", "search/usages", "read/problems", "execute/testFailure", "read/terminalSelection", "read/terminalLastCommand", "web/fetch", "execute/getTerminalOutput"]
 user-invocable: false
 ---
 

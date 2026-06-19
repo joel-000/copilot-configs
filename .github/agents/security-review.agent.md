@@ -1,7 +1,6 @@
 ---
 name: Security Review Agent
 description: Independent adversarial security gate that reviews all plans and changes for exploitable risk, unsafe defaults, and abuse paths before completion.
-tools: ["read", "search"]
 ---
 
 # Security Review Agent

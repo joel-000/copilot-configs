@@ -92,7 +92,7 @@ def collect_agent_records(
 		return agent_names, agent_ids, agent_records
 
 	for path in sorted(agents_dir.glob("*.agent.md")):
-		result = check_required_keys(path, ("name", "description", "tools"), errors)
+		result = check_required_keys(path, ("name", "description"), errors)
 		if not result:
 			continue
 		keys, frontmatter = result

@@ -1,7 +1,6 @@
 ---
 name: Implementer
 description: 'Use when implementing an already approved slice of work that must stay scoped, validated, and complete.'
-tools: ["read", "edit", "search", "terminal"]
 ---
 
 # Implementer

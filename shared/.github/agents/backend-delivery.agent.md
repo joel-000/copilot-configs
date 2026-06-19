@@ -1,7 +1,6 @@
 ---
 name: Backend Delivery Agent
 description: Implements approved backend slices across Python, FastAPI, and AWS-local-compatible paths while preserving minimal diffs and deployability.
-tools: ["read", "edit", "search", "terminal"]
 ---
 
 # Backend Delivery Agent

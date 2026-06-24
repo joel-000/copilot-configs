@@ -5,8 +5,9 @@ Keep this repository as a portable, high-signal Copilot configuration pack with 
 
 ## Current Baseline (Already Landed)
 
-1. **Planning workflow split is implemented**
+1. **Planning workflow is split into approval, context, and execution stages**
    - Human-facing checkpoint lives in `shared/.github/agents/plan.agent.md`.
+   - Snapshot-building context stage lives in `shared/.github/agents/context-builder.agent.md`.
    - Detailed internal planner lives in `shared/.github/agents/implementation-plan.agent.md`.
    - Approved-slice flow is exposed via `shared/.github/prompts/plan-approved-slice.prompt.md`.
 
@@ -27,7 +28,7 @@ Keep this repository as a portable, high-signal Copilot configuration pack with 
    - Remove mixed aliases/patterns such as `terminal` and inconsistent namespaced forms.
 
 3. **Harden the planning workflow rather than merging it**
-   - Keep the two-stage model.
+   - Keep the staged model (`plan -> context-builder -> implementation-plan`).
    - Add explicit UX verification criteria for approval checkpoint and handoff transitions.
    - Tighten guardrails around approved-slice boundaries.
 

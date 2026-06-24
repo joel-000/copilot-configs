@@ -5,27 +5,20 @@ applyTo: '**'
 
 # Planning Agent Orchestration Rules
 
-Use these rules whenever the user asks for planning, a plan step, architecture approach, roadmap, implementation strategy, or design breakdown.
+Use these rules only for planning requests, architecture discussions, roadmaps, implementation strategy, and plan breakdowns.
 
-## Mandatory Routing
+## Routing
 
-1. Always delegate planning requests to `Plan Mode - Strategic Planning & Architecture` first.
-2. If the user approves a slice and asks for a detailed plan, delegate to `Implementation Plan Generation Mode`.
-3. Do not generate final planning output directly in the primary agent when the planning agents are available.
-4. Treat a planning request as a request for analysis only, not implementation approval. Require explicit user approval of a concrete slice before coding starts.
+1. Delegate planning requests to `Plan Mode - Strategic Planning & Architecture`.
+2. After slice approval, route deeper repo discovery through `context-builder` before `Implementation Plan Generation Mode`.
+3. Treat planning as analysis only until the user explicitly approves a concrete slice.
 
-## Mandatory Plan Review Gates
+## Workflow
 
-Before reporting a detailed plan as ready:
+`plan -> context-builder -> implementation-plan -> quality-review(plan) -> security-review(plan) -> implementer -> ...`
 
-1. Run `Quality Review Agent` on the plan.
-2. Run `Security Review Agent` on the plan.
-3. Report both verdicts with blockers (or explicit waivers with owner and accepted risk).
+## Required Gates
 
-If either gate is blocked, do not present the plan as approved for implementation.
-
-## Execution and Testing Priority
-
-1. Plans must prioritize code changes and validation over governance documentation.
-2. Default implementation strategy is Test Driven Development (TDD): define failing tests first, then implement, then pass/refactor.
-3. Keep documentation work scoped to directly impacted docs and schedule it after implementation and change-level quality/security review.
+- Do not treat a detailed plan as implementation-ready until both plan reviews pass or are explicitly waived.
+- Use the `Context Snapshot` as primary downstream repo context.
+- Keep plans execution-first, TDD-first, and documentation-light until implementation is complete.

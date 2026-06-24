@@ -10,7 +10,7 @@ The source of truth lives under `shared/.github/` and mirrors the destination la
 
 | Path | Purpose |
 | --- | --- |
-| `shared/.github/agents/` | Custom agents for planning, implementation, review, testing, security, Terraform, and terminal help |
+| `shared/.github/agents/` | Custom agents for planning, context compression, implementation, review, testing, security, Terraform, and terminal help |
 | `shared/.github/instructions/` | Reusable instruction files scoped by file type or workflow |
 | `shared/.github/prompts/` | Prompt entry points wired to specific agents |
 | `shared/.github/skills/` | Reusable skills for common workflows |
@@ -124,14 +124,18 @@ Review the copied `.github/` tree in the smoke-test directory before distributin
 ### Safe workflow order
 
 1. Start with plan-approved-slice prompt.
-2. Confirm approved slice before implementation.
-3. Run `python scripts/validate.py`.
-4. Run `bash scripts/repo_install.sh <smoke-test-dir>` without `--prune`.
-5. Review installed `.github` tree before broader rollout.
+2. Confirm approved slice before deeper planning or implementation.
+3. Build a `Context Snapshot`, then generate the detailed implementation plan.
+4. Pass compact handoff packets between stages (approved slice, snapshot, delta, gate results) instead of replaying full transcripts.
+5. Run `python scripts/validate.py`.
+6. Run `bash scripts/repo_install.sh <smoke-test-dir>` without `--prune`.
+7. Review installed `.github` tree before broader rollout.
 
 ### Acceptance criteria
 
 - [ ] **Pass:** Prompt explicitly uses a plan-approved slice. **Fail:** Prompt is broad or unscoped.
+- [ ] **Pass:** Context building happens before detailed implementation planning. **Fail:** Downstream agents re-scan the repo instead of reusing a snapshot.
+- [ ] **Pass:** Stage handoffs stay compact and delta-based. **Fail:** Later stages restate full prior outputs without need.
 - [ ] **Pass:** Implementation confirms the approved slice before edits. **Fail:** Work starts without scope confirmation.
 - [ ] **Pass:** `python scripts/validate.py` exits successfully. **Fail:** Validator reports any error.
 - [ ] **Pass:** `bash scripts/repo_install.sh <smoke-test-dir>` runs without `--prune` and completes successfully. **Fail:** Install fails or uses prune mode.

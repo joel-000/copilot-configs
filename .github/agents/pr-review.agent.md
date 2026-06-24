@@ -36,6 +36,12 @@ If any precondition is missing, do not mark the PR as ready.
 2. Confirm the most recent final Quality and Security decisions occur after the latest content edits.
 3. Block readiness when freshness evidence is missing.
 
+## Token Rules
+
+- Build the PR packet from gate results, diff summary, doc delta, and remaining blockers.
+- Do not re-review the whole implementation when prior gate evidence is sufficient.
+- Keep the final output concise and ready to paste.
+
 ## Output
 
 - PR title.

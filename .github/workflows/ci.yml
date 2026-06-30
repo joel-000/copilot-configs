@@ -172,10 +172,26 @@ jobs:
         run: |
           set -euo pipefail
           root_file=".github/agents/implementer.agent.md"
+          shared_file="shared/.github/agents/implementer.agent.md"
+          tmp_created=false
+
+          if [ ! -f "$root_file" ]; then
+            mkdir -p "$(dirname "$root_file")"
+            cp "$shared_file" "$root_file"
+            tmp_created=true
+          fi
+
+          cleanup() {
+            if [ "$tmp_created" = true ]; then
+              rm -f "$root_file"
+            else
+              git checkout -- "$root_file" || true
+            fi
+          }
+          trap cleanup EXIT
+
           printf "\nTemporary drift line for regression check.\n" >> "$root_file"
           if ! python scripts/validate.py; then
             echo "Validator should not fail on root/shared content drift."
-            git checkout -- "$root_file"
             exit 1
           fi
-          git checkout -- "$root_file"

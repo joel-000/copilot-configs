@@ -167,3 +167,15 @@ jobs:
           fi
 
           rm -f "$fixture_file"
+
+      - name: Ensure validator does not require root/shared file mirroring
+        run: |
+          set -euo pipefail
+          root_file=".github/agents/implementer.agent.md"
+          printf "\nTemporary drift line for regression check.\n" >> "$root_file"
+          if ! python scripts/validate.py; then
+            echo "Validator should not fail on root/shared content drift."
+            git checkout -- "$root_file"
+            exit 1
+          fi
+          git checkout -- "$root_file"

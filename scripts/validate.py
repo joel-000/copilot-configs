@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the shared Copilot configuration pack and local mirror files."""
+"""Validate the shared Copilot configuration pack and local artifacts."""
 
 from __future__ import annotations
 
@@ -164,26 +164,6 @@ def validate_skills_dir(skills_dir: Path, errors: List[str]) -> None:
 		check_required_keys(path, ("name", "description"), errors)
 
 
-def check_root_mirrors(root_github: Path, shared_github: Path, errors: List[str]) -> None:
-	for subdir, pattern in (
-		("agents", "*.agent.md"),
-		("prompts", "*.prompt.md"),
-		("instructions", "*.instructions.md"),
-	):
-		root_dir = root_github / subdir
-		shared_dir = shared_github / subdir
-		if not root_dir.is_dir() or not shared_dir.is_dir():
-			continue
-		for root_path in sorted(root_dir.glob(pattern)):
-			shared_path = shared_dir / root_path.name
-			if not shared_path.is_file():
-				continue
-			if root_path.read_text(encoding="utf-8") != shared_path.read_text(
-				encoding="utf-8"
-			):
-				errors.append(f"root mirror drift: {root_path} does not match {shared_path}")
-
-
 def main() -> int:
 	errors: List[str] = []
 
@@ -210,7 +190,6 @@ def main() -> int:
 	validate_agent_handoffs(root_agent_names, root_agent_ids, root_agent_records, errors)
 	validate_instructions_dir(ROOT_GITHUB / "instructions", errors)
 	validate_prompts_dir(ROOT_GITHUB / "prompts", root_agent_names, errors)
-	check_root_mirrors(ROOT_GITHUB, SHARED_GITHUB, errors)
 
 	if errors:
 		print("Validation failed:", file=sys.stderr)

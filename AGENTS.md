@@ -15,6 +15,7 @@
   - agent handoff `agent` references resolve to a real agent `name` or agent file ID
   - prompt `agent` references resolve to a real agent `name`
   - duplicate agent names are not introduced
+  - local `.github/` files are validated for their own frontmatter and references only (no root-vs-shared mirror comparison)
 - Cross-file references are string-based. Example: `shared/.github/prompts/add-fastapi-endpoint.prompt.md` declares `agent: FastAPI API Agent`, which must exactly match an agent `name:` under `shared/.github/agents/`. Agent handoffs may target either that display `name:` or the agent filename without `.agent.md`, such as `implementation-plan`.
 
 ## Frontmatter and file-shape conventions
@@ -33,6 +34,7 @@
 
 ## Editing patterns to follow
 - Make changes under `shared/.github/...`, then validate. Do not edit an installed `.github/` copy and backport later.
+- Do **not** add checks, tests, or workflow steps that enforce automatic synchronization between root `.github/` and `shared/.github/`.
 - Match the existing style: short, task-focused markdown with compact rules or numbered steps. Good examples:
   - `shared/.github/agents/python-engineer.agent.md`
   - `shared/.github/skills/fastapi-endpoint-workflow/SKILL.md`

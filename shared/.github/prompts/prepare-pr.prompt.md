@@ -1,7 +1,7 @@
 ---
 name: prepare-pr
 description: Prepare a PR summary and final review.
-agent: PR Review Agent
+agent: Implementer
 ---
 
 Review the current change and prepare:

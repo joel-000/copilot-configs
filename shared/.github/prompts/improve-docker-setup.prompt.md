@@ -1,7 +1,7 @@
 ---
 name: improve-docker-setup
 description: Improve Dockerfiles and Compose config for security, image size, and modern build practices.
-agent: 'Plan Mode - Strategic Planning & Architecture'
+agent: Implementer
 ---
 
 Plan and deliver container setup improvements using the full workflow.
@@ -17,4 +17,4 @@ Workflow requirements:
 1. Start with approval checkpoint and explicit slice sign-off.
 2. Generate a scoped execution plan with TDD-style validation defaults where supported.
 3. Run `quality-review(plan)` and `security-review(plan)` before implementation; require both pass or explicit waivers (owner + accepted risk).
-4. After plan gates pass, ask the user to switch to Platform Infrastructure Agent for approved implementation.
+4. After plan gates pass, implement the approved slice with minimal, secure changes.

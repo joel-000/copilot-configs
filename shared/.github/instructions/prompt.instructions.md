@@ -53,6 +53,12 @@ Every prompt file should include YAML frontmatter with the following fields:
 - If the prompt inherits tools from a chat mode, mention that relationship and state any critical tool behaviours or side effects.
 - Warn about destructive operations (file creation, edits, terminal commands) and include guard rails or confirmation steps in the workflow.
 
+## Routing Guidance For This Pack
+
+- Prefer `agent: 'Implementer'` as the default routing choice for this configuration pack.
+- Use `Quality Review Test Agent` and `Security Review Agent` only for explicit gate/review prompts.
+- Do not route prompts to specialist orchestration agents unless the repository policy explicitly re-introduces them.
+
 ## Instruction Tone and Style
 - Write in direct, imperative sentences targeted at Copilot (for example, “Analyze”, “Generate”, “Summarize”).
 - Keep sentences short and unambiguous, following Google Developer Documentation translation best practices to support localization.

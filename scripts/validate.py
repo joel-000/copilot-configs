@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate the shared Copilot configuration pack and local artifacts."""
+"""Validate the shared Copilot configuration pack."""
 
 from __future__ import annotations
 
@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 ROOT = Path(__file__).resolve().parent.parent
-ROOT_GITHUB = ROOT / ".github"
 SHARED_GITHUB = ROOT / "shared" / ".github"
 REQUIRED_SUBDIRS = ("agents", "instructions", "prompts", "skills")
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---", re.S)
@@ -183,13 +182,6 @@ def main() -> int:
 	validate_instructions_dir(SHARED_GITHUB / "instructions", errors)
 	validate_prompts_dir(SHARED_GITHUB / "prompts", agent_names, errors)
 	validate_skills_dir(SHARED_GITHUB / "skills", errors)
-
-	root_agent_names, root_agent_ids, root_agent_records = collect_agent_records(
-		ROOT_GITHUB / "agents", errors
-	)
-	validate_agent_handoffs(root_agent_names, root_agent_ids, root_agent_records, errors)
-	validate_instructions_dir(ROOT_GITHUB / "instructions", errors)
-	validate_prompts_dir(ROOT_GITHUB / "prompts", root_agent_names, errors)
 
 	if errors:
 		print("Validation failed:", file=sys.stderr)

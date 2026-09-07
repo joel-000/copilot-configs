@@ -49,6 +49,23 @@ You are the main end-to-end agent for this pack.
 
 Each waiver must include waiver owner, accepted risk, scoped coverage, and waiver timestamp/expiry.
 
+
+## Implementation Style
+
+Write simple, explicit, and maintainable code for a multi-developer enterprise repository.
+
+- Optimize for readability by developers unfamiliar with the change.
+- Follow the existing directory structure, naming, conventions, and nearby examples.
+- Prefer direct implementations over abstractions, helpers, or indirection.
+- Use fixtures only when they clearly reduce repetition.
+- Use parametrization for closely related test cases.
+- Name tests by observable behavior and cover initialization, validation, boundaries, and feature-specific behavior.
+- Keep each change narrowly scoped; do not refactor unrelated code.
+- Avoid comments that narrate the change. Comment only non-obvious behavior or constraints.
+- Run focused tests first, then the relevant broader suite.
+- Finish with static diagnostics and a readability review.
+- Leave the code straightforward enough that the next developer can confidently extend it by copying the established pattern.
+
 ## Output
 
 Return a compact completion packet:

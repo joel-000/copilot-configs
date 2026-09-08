@@ -6,27 +6,28 @@ Reusable GitHub Copilot configuration files that can be copied into new reposito
 
 ## What this repository contains
 
-The source of truth lives under `shared/.github/` and mirrors the destination layout used in target repositories.
+The source of truth lives under `copilot/`. Its contents map directly to `~/.copilot/` and can also be copied into a repository's `.github/` directory.
 
 | Path | Purpose |
 | --- | --- |
-| `shared/.github/agents/` | Custom agents for planning, context compression, implementation, review, testing, security, Terraform, and terminal help |
-| `shared/.github/instructions/` | Reusable instruction files scoped by file type or workflow |
-| `shared/.github/prompts/` | Prompt entry points wired to specific agents |
-| `shared/.github/skills/` | Reusable skills for common workflows |
+| `copilot/agents/` | Custom agents for planning, context compression, implementation, review, testing, security, Terraform, and terminal help |
+| `copilot/instructions/` | Reusable instruction files scoped by file type or workflow |
+| `copilot/prompts/` | Prompt entry points wired to specific agents |
+| `copilot/skills/` | Reusable skills for common workflows |
+| `copilot/copilot-instructions.md` | Global Copilot instructions |
 | `scripts/repo_install.sh` | Installer that copies the pack into a repository |
-| `scripts/pycharm_install.sh` | Installer that links the pack into user-level PyCharm Copilot directories |
+| `scripts/global_install.sh` | Installer that links the pack into the global user-level Copilot directory used by VS Code and PyCharm |
 | `scripts/validate.py` | Validation script for frontmatter, references, and layout |
 
 ## Repository layout
 
 ```text
-shared/
-└── .github/
-	├── agents/
-	├── instructions/
-	├── prompts/
-	└── skills/
+copilot/
+├── agents/
+├── instructions/
+├── prompts/
+├── skills/
+└── copilot-instructions.md
 ```
 
 ## Install into a repository
@@ -55,31 +56,32 @@ Show help:
 bash scripts/repo_install.sh --help
 ```
 
-## Install globally for PyCharm
+## Install globally
 
-Create user-level symlinks so all PyCharm projects immediately use this repository's current shared config.
+Create user-level symlinks so VS Code and PyCharm use this repository's current Copilot config.
 
 ```bash
-bash scripts/pycharm_install.sh
+bash scripts/global_install.sh
 ```
 
 You can override the base path and force replacement of conflicting paths:
 
 ```bash
-bash scripts/pycharm_install.sh --copilot-home /custom/copilot/home --force
+bash scripts/global_install.sh --copilot-home /custom/copilot/home --force
 ```
 
 This links:
 
-- `~/.copilot/instructions` -> `shared/.github/instructions`
-- `~/.copilot/agents` -> `shared/.github/agents`
-- `~/.copilot/prompts` -> `shared/.github/prompts`
-- `~/.copilot/skills` -> `shared/.github/skills`
+- `~/.copilot/instructions` -> `copilot/instructions`
+- `~/.copilot/agents` -> `copilot/agents`
+- `~/.copilot/prompts` -> `copilot/prompts`
+- `~/.copilot/skills` -> `copilot/skills`
+- `~/.copilot/copilot-instructions.md` -> `copilot/copilot-instructions.md`
 
 Show help:
 
 ```bash
-bash scripts/pycharm_install.sh --help
+bash scripts/global_install.sh --help
 ```
 
 ## Validate this pack
@@ -92,18 +94,18 @@ python scripts/validate.py
 
 The validator currently checks:
 
-- expected `shared/.github/` subdirectories exist
+- expected `copilot/` subdirectories exist
 - required frontmatter keys exist on agents, instructions, prompts, and skills
 - agent handoff `agent` references resolve to real agent names or agent file IDs
 - prompt `agent` references resolve to real agent names
 - duplicate agent names are not introduced
-- symlink artifacts are rejected under `shared/.github/`
+- symlink artifacts are rejected under `copilot/`
 - repository-level `.github/` agents, instructions, and prompts also keep valid frontmatter and internal references
 
 ## Maintenance guidance
 
-- Keep `shared/.github/` as the canonical source tree.
-- Do not rely on automatic synchronization between root `.github/` and `shared/.github/`; root-level files are optional local artifacts.
+- Keep `copilot/` as the canonical source tree.
+- Do not rely on automatic synchronization between root `.github/` and `copilot/`; root-level files are optional local artifacts.
 - Prefer additive installs by default; only use `--prune` when you intend to remove unmanaged target files.
 - When adding or changing an agent handoff, validate that its `agent` value matches an agent `name` or agent filename without `.agent.md`.
 - When adding a new prompt, validate that its `agent` value exactly matches an agent `name`.

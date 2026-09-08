@@ -2,13 +2,13 @@
 set -euo pipefail
 
 SOURCE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SOURCE_GITHUB="${SOURCE_ROOT}/shared/.github"
+COPILOT_SOURCE="${SOURCE_ROOT}/copilot"
 
 usage() {
   cat <<'EOF'
 Usage: scripts/repo_install.sh [--prune --confirm-prune] [TARGET]
 
-Install the shared Copilot configuration pack into TARGET.
+Install the Copilot configuration pack into TARGET.
 
 - TARGET defaults to the current working directory.
 - TARGET may be either a repository root or a direct .github directory.
@@ -126,8 +126,8 @@ if [[ "${PRUNE}" == true && "${CONFIRM_PRUNE}" != true ]]; then
   exit 1
 fi
 
-if [[ ! -d "${SOURCE_GITHUB}" ]]; then
-  echo "Expected source directory not found: ${SOURCE_GITHUB}" >&2
+if [[ ! -d "${COPILOT_SOURCE}" ]]; then
+  echo "Expected source directory not found: ${COPILOT_SOURCE}" >&2
   exit 1
 fi
 
@@ -184,7 +184,7 @@ if [[ "${PRUNE}" == true ]]; then
   RSYNC_ARGS+=(--delete)
 fi
 
-if [[ ! -d "${SOURCE_GITHUB}" || ! -d "${TARGET_GITHUB_CANONICAL}" ]]; then
+if [[ ! -d "${COPILOT_SOURCE}" || ! -d "${TARGET_GITHUB_CANONICAL}" ]]; then
   echo "Validation failed before sync; source or target directory missing." >&2
   exit 1
 fi
@@ -202,7 +202,7 @@ fi
 
 rsync "${RSYNC_ARGS[@]}" \
   -- \
-  "${SOURCE_GITHUB}/" \
+  "${COPILOT_SOURCE}/" \
   "${TARGET_GITHUB_CANONICAL}/"
 
 MODE="merged safely"

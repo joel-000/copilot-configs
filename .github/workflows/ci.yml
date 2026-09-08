@@ -6,14 +6,14 @@ permissions:
 on:
   pull_request:
     paths:
-      - "shared/.github/**"
+      - "copilot/**"
       - "scripts/**"
       - ".github/**"
   push:
     branches:
       - master
     paths:
-      - "shared/.github/**"
+      - "copilot/**"
       - "scripts/**"
       - ".github/**"
   workflow_dispatch:
@@ -73,45 +73,49 @@ jobs:
             exit 1
           fi
 
-      - name: Smoke test PyCharm installer links
+      - name: Smoke test global installer links
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
           repo_root="$(pwd)"
-          bash scripts/pycharm_install.sh --allow-outside-home --copilot-home "$copilot_home"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
           test -L "$copilot_home/instructions"
           test -L "$copilot_home/agents"
           test -L "$copilot_home/prompts"
           test -L "$copilot_home/skills"
-          test "$(readlink "$copilot_home/instructions")" = "$repo_root/shared/.github/instructions"
-          test "$(readlink "$copilot_home/agents")" = "$repo_root/shared/.github/agents"
-          test "$(readlink "$copilot_home/prompts")" = "$repo_root/shared/.github/prompts"
-          test "$(readlink "$copilot_home/skills")" = "$repo_root/shared/.github/skills"
+          test "$(readlink "$copilot_home/instructions")" = "$repo_root/copilot/instructions"
+          test "$(readlink "$copilot_home/agents")" = "$repo_root/copilot/agents"
+          test "$(readlink "$copilot_home/prompts")" = "$repo_root/copilot/prompts"
+          test "$(readlink "$copilot_home/skills")" = "$repo_root/copilot/skills"
+          test "$(readlink "$copilot_home/copilot-instructions.md")" = "$repo_root/copilot/copilot-instructions.md"
 
-      - name: Verify PyCharm installer idempotency
+      - name: Verify global installer idempotency
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
-          bash scripts/pycharm_install.sh --allow-outside-home --copilot-home "$copilot_home"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
           first_snapshot="$(find "$copilot_home" -mindepth 1 -maxdepth 1 -printf '%f:%l\n' | sort)"
-          bash scripts/pycharm_install.sh --allow-outside-home --copilot-home "$copilot_home"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
           second_snapshot="$(find "$copilot_home" -mindepth 1 -maxdepth 1 -printf '%f:%l\n' | sort)"
           test "$first_snapshot" = "$second_snapshot"
 
-      - name: Verify PyCharm installer force-replaces conflicts
+      - name: Verify global installer force-replaces conflicts
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
           repo_root="$(pwd)"
           mkdir -p "$copilot_home/prompts"
           printf "stale prompt config\n" > "$copilot_home/prompts/old.txt"
-          if bash scripts/pycharm_install.sh --allow-outside-home --copilot-home "$copilot_home"; then
-            echo "Expected installer to fail when prompts path conflicts without --force."
+          ln -s /tmp/stale-agent-config "$copilot_home/agents"
+          if bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"; then
+            echo "Expected installer to fail when managed paths conflict without --force."
             exit 1
           fi
-          bash scripts/pycharm_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          test -L "$copilot_home/agents"
           test -L "$copilot_home/prompts"
-          test "$(readlink "$copilot_home/prompts")" = "$repo_root/shared/.github/prompts"
+          test "$(readlink "$copilot_home/agents")" = "$repo_root/copilot/agents"
+          test "$(readlink "$copilot_home/prompts")" = "$repo_root/copilot/prompts"
 
   validator-regression:
     runs-on: ubuntu-latest
@@ -122,7 +126,7 @@ jobs:
       - name: Ensure validator fails on broken prompt agent references
         run: |
           set -euo pipefail
-          fixture_file="shared/.github/prompts/zz-regression-bad-agent.prompt.md"
+          fixture_file="copilot/prompts/zz-regression-bad-agent.prompt.md"
           cat > "$fixture_file" <<'EOF'
           ---
           name: 'Regression fixture'
@@ -144,7 +148,7 @@ jobs:
       - name: Ensure validator fails on broken handoff agent references
         run: |
           set -euo pipefail
-          fixture_file="shared/.github/agents/zz-regression-bad-handoff.agent.md"
+          fixture_file="copilot/agents/zz-regression-bad-handoff.agent.md"
           cat > "$fixture_file" <<'EOF'
           ---
           name: 'Regression Handoff Fixture'
@@ -168,16 +172,16 @@ jobs:
 
           rm -f "$fixture_file"
 
-      - name: Ensure validator does not require root/shared file mirroring
+      - name: Ensure validator does not require root/source file mirroring
         run: |
           set -euo pipefail
           root_file=".github/agents/implementer.agent.md"
-          shared_file="shared/.github/agents/implementer.agent.md"
+          source_file="copilot/agents/implementer.agent.md"
           tmp_created=false
 
           if [ ! -f "$root_file" ]; then
             mkdir -p "$(dirname "$root_file")"
-            cp "$shared_file" "$root_file"
+            cp "$source_file" "$root_file"
             tmp_created=true
           fi
 
@@ -192,6 +196,6 @@ jobs:
 
           printf "\nTemporary drift line for regression check.\n" >> "$root_file"
           if ! python scripts/validate.py; then
-            echo "Validator should not fail on root/shared content drift."
+            echo "Validator should not fail on root/source content drift."
             exit 1
           fi

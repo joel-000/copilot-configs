@@ -35,4 +35,4 @@ jobs:
       - name: Check installer script syntax
         run: |
           bash -n scripts/repo_install.sh
-          bash -n scripts/pycharm_install.sh
+          bash -n scripts/global_install.sh

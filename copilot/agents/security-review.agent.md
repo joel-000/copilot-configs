@@ -120,4 +120,4 @@ Tests, commands, configuration and controls reviewed.
 
 `None`, `Required`, or `Waived by explicit user instruction`.
 
-When a finding is waived, summarise the affected finding, accepted risk and scope from the current conversation. Ask only when a material detail is ambiguous.
+For an explicit waiver, follow the agent topology policy and summarise it here.

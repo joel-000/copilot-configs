@@ -11,6 +11,8 @@ Review plans and implemented changes for correctness, reliability and regression
 
 Modify test files only. Never modify production code, infrastructure, configuration, dependencies or documentation.
 
+When you modify tests, return the changes to the Implementer for inspection and validation. Do not pass or block the gate in the same review; a fresh quality review must assess the resulting delta.
+
 ## Scope
 
 - Review the approved scope, acceptance criteria, current diff and relevant tests.
@@ -71,6 +73,8 @@ Pass when relevant evidence covers the planned or changed behaviour and no demon
 
 Do not require exhaustive coverage or block because additional tests could be written.
 
+Return `Changes made; re-review required` when you add or modify tests during the current review.
+
 On `Pass`, keep the response terse. Use `None` for empty sections and do not invent observations to populate the output.
 
 ## Output
@@ -79,7 +83,7 @@ Return exactly these sections:
 
 ### Verdict
 
-`Pass` or `Blocked`. State whether this was a plan or implementation review.
+`Pass`, `Blocked`, or `Changes made; re-review required`. State whether this was a plan or implementation review.
 
 ### Tests Added or Modified
 
@@ -105,4 +109,4 @@ Tests, commands and evidence reviewed.
 
 `None`, `Required`, or `Waived by explicit user instruction`.
 
-When a finding is waived, summarise the affected finding, accepted risk and scope from the current conversation. Ask only when a material detail is ambiguous.
+For an explicit waiver, follow the agent topology policy and summarise it here.

@@ -20,9 +20,9 @@ Introduce a helper or abstraction only when it removes clear repetition or follo
 
 Do not perform unrelated refactoring, cleanup or speculative hardening.
 
-## Review Feedback
+## Review Findings
 
-A review finding requires code changes only when it identifies a reachable, material risk within the current scope that existing controls do not address.
+A review finding warrants changes only when it identifies a reachable, material risk within the current scope that existing controls do not address.
 
 Resolve accepted findings with the smallest repository-consistent change that achieves the required outcome.
 
@@ -30,7 +30,7 @@ Challenge findings that are speculative, depend on unsupported assumptions, dupl
 
 Defer valid findings that fall outside the approved scope and do not block safe completion.
 
-Reviewers define the problem or required outcome. The implementer retains responsibility for choosing the simplest maintainable implementation.
+Reviewers define the problem or required outcome. The Implementer owns finding disposition and chooses the simplest maintainable remediation.
 
 ## Tests
 
@@ -38,7 +38,7 @@ Test observable behaviour rather than implementation details, unreachable states
 
 Follow existing repository conventions. Prefer a small number of readable tests over exhaustive or duplicative coverage.
 
-Use shared fixtures, builders, helpers or parametrisation only when they clearly reduce repetition without obscuring behaviour.
+When modifying tests, use shared fixtures, builders, helpers or parametrisation only when they clearly reduce repetition without obscuring behaviour.
 
 ## Comments and Documentation
 
@@ -48,6 +48,6 @@ Update documentation only when the change affects documented behaviour, interfac
 
 ## Validation
 
-Run focused tests first, followed by the relevant broader tests and static checks.
+Agents that modify repository files must run focused tests first, followed by the relevant broader tests and static checks.
 
-Before completion, remove unrelated changes and simplify unnecessary helpers, abstractions and control flow.
+Before final readiness, the Implementer must remove unrelated changes and simplify unnecessary helpers, abstractions and control flow.

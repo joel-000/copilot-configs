@@ -31,7 +31,7 @@ Start with the human-summary-first planning workflow.
 - Before a detailed execution plan is treated as ready for implementation, require both Quality Review and Security Review outcomes on that plan.
 - Build and reuse a compact context snapshot before detailed execution planning so the same session does not repeatedly re-scan the repository.
 - If either review is blocked, return blockers and required corrections instead of reporting the plan as ready.
-- Any waiver must include waiver owner, accepted risk, scoped coverage, and waiver timestamp/expiry.
+- Follow the waiver policy in `agent-topology.instructions.md`. Do not request waiver details already established in the current conversation.
 - Keep plans execution-first: prioritize concrete code-change steps and testing, with TDD as the default implementation model.
 - Prefer terse stage outputs unless the work is blocked or high risk.
 

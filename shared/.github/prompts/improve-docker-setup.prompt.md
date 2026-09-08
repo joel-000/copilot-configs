@@ -16,5 +16,5 @@ Focus during planning and implementation:
 Workflow requirements:
 1. Start with approval checkpoint and explicit slice sign-off.
 2. Generate a scoped execution plan with TDD-style validation defaults where supported.
-3. Run `quality-review(plan)` and `security-review(plan)` before implementation; require both pass or explicit waivers (owner + accepted risk).
+3. Run `quality-review(plan)` and `security-review(plan)` before implementation; require both to pass or be explicitly waived under `agent-topology.instructions.md`.
 4. After plan gates pass, implement the approved slice with minimal, secure changes.

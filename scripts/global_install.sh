@@ -39,6 +39,13 @@ canonicalize_link_target() {
   fi
 }
 
+pack_root_from_link_target() {
+  local target="$1"
+  local managed_basename="$2"
+
+  printf '%s\n' "${target%/${managed_basename}}"
+}
+
 copilot_root_from_managed_item_link() {
   local item="$1"
   local expected_basename
@@ -63,12 +70,12 @@ copilot_root_from_managed_item_link() {
 
   target="$(readlink -- "${link_path}" 2>/dev/null || true)"
   if [[ "${target}" == /* ]] && [[ "$(basename -- "${target}")" == "${expected_basename}" ]]; then
-    dirname -- "${target}"
+    pack_root_from_link_target "${target}" "${expected_basename}"
     return 0
   fi
 
   if target="$(canonicalize_link_target "${link_path}" 2>/dev/null)" && [[ "$(basename -- "${target}")" == "${expected_basename}" ]]; then
-    dirname -- "${target}"
+    pack_root_from_link_target "${target}" "${expected_basename}"
     return 0
   fi
 

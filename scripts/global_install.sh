@@ -26,6 +26,18 @@ canonicalize_path() {
   realpath -m -- "$1"
 }
 
+canonicalize_link_target() {
+  local link_path="$1"
+  local link_target
+  link_target="$(readlink -- "${link_path}")"
+
+  if [[ "${link_target}" == /* ]]; then
+    canonicalize_path "${link_target}"
+  else
+    canonicalize_path "$(dirname "${link_path}")/${link_target}"
+  fi
+}
+
 reject_symlink_components() {
   local path="$1"
   local probe="/"
@@ -99,9 +111,12 @@ validate_source_tree() {
 
 cleanup_legacy_prompt_link() {
   local legacy_target="${COPILOT_SOURCE}/prompts"
+  local legacy_target_canonical
   local legacy_link="${COPILOT_HOME}/prompts"
 
-  if [[ -L "${legacy_link}" ]] && [[ "$(readlink -- "${legacy_link}")" == "${legacy_target}" ]]; then
+  legacy_target_canonical="$(canonicalize_path "${legacy_target}")"
+
+  if [[ -L "${legacy_link}" ]] && [[ "$(canonicalize_link_target "${legacy_link}")" == "${legacy_target_canonical}" ]]; then
     # Re-check the entry immediately before removal; never follow the link.
     if [[ -L "${legacy_link}" ]]; then
       rm -- "${legacy_link}"

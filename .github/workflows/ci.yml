@@ -100,7 +100,7 @@ jobs:
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
-          ln -s "$(pwd)/copilot/prompts" "$copilot_home/prompts"
+          ln -s "$(pwd)/copilot/skills/../prompts" "$copilot_home/prompts"
           bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
           test ! -L "$copilot_home/prompts"
 

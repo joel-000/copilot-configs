@@ -74,6 +74,29 @@ copilot_root_from_managed_item_link() {
   return 1
 }
 
+is_valid_pack_root() {
+  local root="$1"
+  local item
+
+  if [[ ! -d "${root}" ]]; then
+    return 1
+  fi
+
+  for item in "${MANAGED_DIRECTORIES[@]}"; do
+    if [[ ! -d "${root}/${item}" ]]; then
+      return 1
+    fi
+  done
+
+  for item in "${MANAGED_FILES[@]}"; do
+    if [[ ! -f "${root}/${item}" ]]; then
+      return 1
+    fi
+  done
+
+  return 0
+}
+
 reject_symlink_components() {
   local path="$1"
   local probe="/"
@@ -156,7 +179,7 @@ cleanup_legacy_prompt_link() {
   local -a legacy_roots=("${COPILOT_SOURCE}")
 
   for item in "${MANAGED_DIRECTORIES[@]}" "${MANAGED_FILES[@]}"; do
-    if candidate_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)"; then
+    if candidate_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)" && is_valid_pack_root "${candidate_root}"; then
       legacy_roots+=("${candidate_root}")
     fi
   done

@@ -129,6 +129,17 @@ jobs:
           bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
           test ! -L "$copilot_home/prompts"
 
+      - name: Verify global installer preserves unrelated prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          unrelated_root="$(mktemp -d)/copilot"
+          ln -s "${unrelated_root}/agents" "$copilot_home/agents"
+          ln -s "${unrelated_root}/prompts" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          test -L "$copilot_home/prompts"
+          test "$(readlink "$copilot_home/prompts")" = "${unrelated_root}/prompts"
+
       - name: Verify global installer force-replaces conflicts
         run: |
           set -euo pipefail

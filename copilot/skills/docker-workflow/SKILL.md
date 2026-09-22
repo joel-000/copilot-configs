@@ -10,8 +10,10 @@ description: Use when improving Dockerfiles, Compose files, image size, build re
 2. State the goal, largest uncertainty, smallest useful slice, and wait for
    explicit approval before deeper planning or edits.
 3. For a material plan, follow the review gates in
-   `copilot/instructions/agent-topology.instructions.md`.
-4. Make the smallest change that addresses the approved slice. Apply the
+   `copilot/instructions/agent-topology.instructions.md` and do not implement
+   until the required gates pass or are explicitly waived.
+4. After approval and any required gate pass or waiver, make the smallest
+   change that addresses the approved slice. Apply the
    Docker standards in
    `copilot/instructions/containerization-docker-best-practices.instructions.md`
    and platform-security guidance in

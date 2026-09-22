@@ -5,6 +5,7 @@ SOURCE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COPILOT_SOURCE="${SOURCE_ROOT}/copilot"
 MANAGED_DIRECTORIES=(instructions agents skills)
 MANAGED_FILES=(copilot-instructions.md)
+PACK_MARKER="<!-- copilot-config-pack: joel-000/copilot-configs -->"
 
 COPILOT_HOME="${HOME}/.copilot"
 FORCE=false
@@ -97,6 +98,13 @@ is_valid_pack_root() {
   return 0
 }
 
+has_pack_marker() {
+  local root="$1"
+  local marker_file="${root}/copilot-instructions.md"
+
+  [[ -f "${marker_file}" ]] && grep -Fqx "${PACK_MARKER}" "${marker_file}"
+}
+
 reject_symlink_components() {
   local path="$1"
   local probe="/"
@@ -166,6 +174,11 @@ validate_source_tree() {
       exit 1
     fi
   done
+
+  if ! has_pack_marker "${COPILOT_SOURCE}"; then
+    echo "Expected pack marker not found in ${COPILOT_SOURCE}/copilot-instructions.md" >&2
+    exit 1
+  fi
 }
 
 cleanup_legacy_prompt_link() {
@@ -179,7 +192,7 @@ cleanup_legacy_prompt_link() {
   local -a legacy_roots=("${COPILOT_SOURCE}")
 
   for item in "${MANAGED_DIRECTORIES[@]}" "${MANAGED_FILES[@]}"; do
-    if candidate_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)" && is_valid_pack_root "${candidate_root}"; then
+    if candidate_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)" && is_valid_pack_root "${candidate_root}" && has_pack_marker "${candidate_root}"; then
       legacy_roots+=("${candidate_root}")
     fi
   done

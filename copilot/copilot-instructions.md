@@ -1,3 +1,5 @@
+<!-- copilot-config-pack: joel-000/copilot-configs -->
+
 # Repository Instructions
 
 ## Universal approval boundary

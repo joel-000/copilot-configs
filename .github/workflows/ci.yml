@@ -110,10 +110,11 @@ jobs:
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
+          repo_root="$(realpath -m "$(pwd)")"
           old_root_base="$(mktemp -d)"
           old_root="${old_root_base}/copilot"
           mkdir -p "${old_root}/agents" "${old_root}/instructions" "${old_root}/skills"
-          printf "legacy\n" > "${old_root}/copilot-instructions.md"
+          cp "${repo_root}/copilot/copilot-instructions.md" "${old_root}/copilot-instructions.md"
           ln -s "${old_root}/agents" "$copilot_home/agents"
           ln -s "${old_root}/instructions" "$copilot_home/instructions"
           ln -s "${old_root}/skills" "$copilot_home/skills"
@@ -170,29 +171,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Ensure validator ignores legacy prompt artifacts
+      - name: Ensure repository contains no legacy prompt artifacts
         run: |
           set -euo pipefail
-          fixture_file="copilot/prompts/zz-regression-bad-agent.prompt.md"
-          mkdir -p "$(dirname "$fixture_file")"
-          cat > "$fixture_file" <<'EOF'
-          ---
-          name: 'Regression fixture'
-          description: 'Intentionally invalid prompt for validator regression checks'
-          agent: 'Nonexistent Agent Name'
-          ---
-
-          This file intentionally contains an invalid agent reference.
-          EOF
-
-          cleanup() {
-            rm -f "$fixture_file"
-            rmdir "$(dirname "$fixture_file")" 2>/dev/null || true
-          }
-          trap cleanup EXIT
-
-          if ! python scripts/validate.py; then
-            echo "Validator should ignore legacy prompt artifacts."
+          if find copilot -path '*/prompts/*.prompt.md' -print | grep -q .; then
+            echo "Legacy prompt artifacts must not exist under copilot/."
             exit 1
           fi
 

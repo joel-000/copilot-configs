@@ -5,7 +5,8 @@ description: Use when assessing whether a change is ready for review or preparin
 
 # PR Readiness
 
-Assess the current diff against the approved slice and acceptance criteria.
+Assess the current `git status`, including untracked files, and the current
+diff against the approved slice and acceptance criteria.
 Reuse current gate verdicts under
 `copilot/instructions/agent-topology.instructions.md`; request re-review only
 when the delta is material to that gate.

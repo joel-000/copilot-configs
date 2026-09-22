@@ -628,31 +628,31 @@ The migration is complete only when all of the following are true:
 
 - [x] No capability was intentionally dropped; unavailable client checks are
   recorded as an environment limitation rather than a pass claim.
-- [ ] The five source prompt files are deleted.
-- [ ] `fastapi-endpoint-workflow` contains the durable FastAPI workflow details
+- [x] The five source prompt files are deleted.
+- [x] `fastapi-endpoint-workflow` contains the durable FastAPI workflow details
   without duplicating test or topology policy.
-- [ ] `terraform-plan-review` contains the richer read-only review, evidence,
+- [x] `terraform-plan-review` contains the richer read-only review, evidence,
   output, and validation contract.
-- [ ] `docker-workflow` and `pr-readiness` exist and are discoverable.
-- [ ] The approval checkpoint works without prompt-file support through
+- [x] `docker-workflow` and `pr-readiness` exist and are discoverable.
+- [x] The approval checkpoint works without prompt-file support through
   `Implementer` and global policy; an approval skill exists only with recorded
   cross-client trigger evidence.
-- [ ] `git-commit` and `pr-readiness` have non-overlapping ownership.
-- [ ] `create-readme` and `documentation-writer` have non-overlapping primary
+- [x] `git-commit` and `pr-readiness` have non-overlapping ownership.
+- [x] `create-readme` and `documentation-writer` have non-overlapping primary
   selection rules.
-- [ ] `pytest-unit-test-workflow` and `tdd-red-green` retain their intentional
+- [x] `pytest-unit-test-workflow` and `tdd-red-green` retain their intentional
   test-only versus test-first-implementation boundary.
-- [ ] Docker and security standards remain canonical in instruction files rather
+- [x] Docker and security standards remain canonical in instruction files rather
   than copied into workflow skills.
-- [ ] Gate timing, re-review, and waiver policy remain canonical in
+- [x] Gate timing, re-review, and waiver policy remain canonical in
   `agent-topology.instructions.md`.
-- [ ] Prompt-only instructions, validator logic, installer mapping, and
+- [x] Prompt-only instructions, validator logic, installer mapping, and
   documentation are removed or updated.
-- [ ] Legacy global prompt-symlink cleanup is ownership-checked, and repository
+- [x] Legacy global prompt-symlink cleanup is ownership-checked, and repository
   cleanup does not silently delete user-managed files.
-- [ ] A fresh repository install contains the intended agents, instructions,
+- [x] A fresh repository install contains the intended agents, instructions,
   skills, and global instructions with no prompt files.
-- [ ] `python scripts/validate.py` and `git diff --check` pass.
+- [x] `python scripts/validate.py` and `git diff --check` pass.
 - [ ] Quality and security reviews pass, or explicit waivers are recorded.
 - [ ] No accepted blocker remains and the completion packet records files,
   validation, gate verdicts, waivers, and follow-ups.

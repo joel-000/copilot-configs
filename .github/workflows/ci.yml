@@ -110,7 +110,10 @@ jobs:
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
-          old_root="$(mktemp -d)/copilot"
+          old_root_base="$(mktemp -d)"
+          old_root="${old_root_base}/copilot"
+          mkdir -p "${old_root}/agents" "${old_root}/instructions" "${old_root}/skills"
+          printf "legacy\n" > "${old_root}/copilot-instructions.md"
           ln -s "${old_root}/agents" "$copilot_home/agents"
           ln -s "${old_root}/instructions" "$copilot_home/instructions"
           ln -s "${old_root}/skills" "$copilot_home/skills"

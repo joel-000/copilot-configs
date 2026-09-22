@@ -111,6 +111,7 @@ validate_source_tree() {
 
 cleanup_legacy_prompt_link() {
   local legacy_target="${COPILOT_SOURCE}/prompts"
+  local legacy_link_target
   local legacy_link_canonical
   local legacy_target_canonical
   local legacy_link="${COPILOT_HOME}/prompts"
@@ -118,7 +119,11 @@ cleanup_legacy_prompt_link() {
   legacy_target_canonical="$(canonicalize_path "${legacy_target}")"
 
   if [[ -L "${legacy_link}" ]]; then
-    if legacy_link_canonical="$(canonicalize_link_target "${legacy_link}" 2>/dev/null)" && [[ "${legacy_link_canonical}" == "${legacy_target_canonical}" ]]; then
+    legacy_link_target="$(readlink -- "${legacy_link}" 2>/dev/null || true)"
+    if [[ "${legacy_link_target}" == "${legacy_target}" ]] || {
+      legacy_link_canonical="$(canonicalize_link_target "${legacy_link}" 2>/dev/null)" &&
+      [[ "${legacy_link_canonical}" == "${legacy_target_canonical}" ]]
+    }; then
       # Re-check the entry immediately before removal; never follow the link.
       if [[ -L "${legacy_link}" ]]; then
         rm -- "${legacy_link}"

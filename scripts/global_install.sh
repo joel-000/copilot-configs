@@ -210,7 +210,6 @@ cleanup_legacy_prompt_link() {
   local candidate_source_root
   local candidate_target
   local item
-  local legacy_target="${COPILOT_SOURCE}/prompts"
   local legacy_link_target
   local legacy_link_canonical
   local legacy_link="${COPILOT_HOME}/prompts"

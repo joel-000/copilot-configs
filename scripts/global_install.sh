@@ -109,6 +109,16 @@ is_valid_copilot_source_root() {
   return 0
 }
 
+is_cleanup_candidate_copilot_source_root() {
+  local root="$1"
+
+  [[ -d "${root}" ]] &&
+    [[ -d "${root}/agents" ]] &&
+    [[ -d "${root}/instructions" ]] &&
+    [[ -f "${root}/copilot-instructions.md" ]] &&
+    ([[ -d "${root}/skills" ]] || [[ -d "${root}/prompts" ]])
+}
+
 has_pack_marker() {
   local root="$1"
   local marker_file="${root}/copilot-instructions.md"
@@ -216,7 +226,7 @@ cleanup_legacy_prompt_link() {
   local -a legacy_source_roots=("${COPILOT_SOURCE}")
 
   for item in "${MANAGED_DIRECTORIES[@]}" "${MANAGED_FILES[@]}"; do
-    if candidate_source_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)" && is_valid_copilot_source_root "${candidate_source_root}" && has_pack_marker "${candidate_source_root}"; then
+    if candidate_source_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)" && is_cleanup_candidate_copilot_source_root "${candidate_source_root}" && has_pack_marker "${candidate_source_root}"; then
       if ! array_contains "${candidate_source_root}" "${legacy_source_roots[@]}"; then
         legacy_source_roots+=("${candidate_source_root}")
       fi

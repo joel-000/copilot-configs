@@ -151,6 +151,21 @@ jobs:
           test -L "$copilot_home/prompts"
           test "$(readlink "$copilot_home/prompts")" = "${unrelated_prompts_target}"
 
+      - name: Verify global installer preserves unrelated prompt-era pack link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          unrelated_root="$(mktemp -d)/copilot"
+          mkdir -p "${unrelated_root}/agents" "${unrelated_root}/instructions" "${unrelated_root}/prompts"
+          printf "legacy\n" > "${unrelated_root}/copilot-instructions.md"
+          ln -s "${unrelated_root}/agents" "$copilot_home/agents"
+          ln -s "${unrelated_root}/instructions" "$copilot_home/instructions"
+          ln -s "${unrelated_root}/copilot-instructions.md" "$copilot_home/copilot-instructions.md"
+          ln -s "${unrelated_root}/prompts" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          test -L "$copilot_home/prompts"
+          test "$(readlink "$copilot_home/prompts")" = "${unrelated_root}/prompts"
+
       - name: Verify global installer force-replaces conflicts
         run: |
           set -euo pipefail

@@ -39,7 +39,7 @@ canonicalize_link_target() {
   fi
 }
 
-pack_root_from_link_target() {
+copilot_source_root_from_link_target() {
   local target="$1"
   local managed_basename="$2"
 
@@ -70,19 +70,19 @@ copilot_root_from_managed_item_link() {
 
   target="$(readlink -- "${link_path}" 2>/dev/null || true)"
   if [[ "${target}" == /* ]] && [[ "$(basename -- "${target}")" == "${expected_basename}" ]]; then
-    pack_root_from_link_target "${target}" "${expected_basename}"
+    copilot_source_root_from_link_target "${target}" "${expected_basename}"
     return 0
   fi
 
   if target="$(canonicalize_link_target "${link_path}" 2>/dev/null)" && [[ "$(basename -- "${target}")" == "${expected_basename}" ]]; then
-    pack_root_from_link_target "${target}" "${expected_basename}"
+    copilot_source_root_from_link_target "${target}" "${expected_basename}"
     return 0
   fi
 
   return 1
 }
 
-is_valid_pack_root() {
+is_valid_copilot_source_root() {
   local root="$1"
   local item
 
@@ -203,19 +203,19 @@ validate_source_tree() {
 }
 
 cleanup_legacy_prompt_link() {
-  local candidate_root
+  local candidate_source_root
   local candidate_target
   local item
   local legacy_target="${COPILOT_SOURCE}/prompts"
   local legacy_link_target
   local legacy_link_canonical
   local legacy_link="${COPILOT_HOME}/prompts"
-  local -a legacy_roots=("${COPILOT_SOURCE}")
+  local -a legacy_source_roots=("${COPILOT_SOURCE}")
 
   for item in "${MANAGED_DIRECTORIES[@]}" "${MANAGED_FILES[@]}"; do
-    if candidate_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)" && is_valid_pack_root "${candidate_root}" && has_pack_marker "${candidate_root}"; then
-      if ! array_contains "${candidate_root}" "${legacy_roots[@]}"; then
-        legacy_roots+=("${candidate_root}")
+    if candidate_source_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)" && is_valid_copilot_source_root "${candidate_source_root}" && has_pack_marker "${candidate_source_root}"; then
+      if ! array_contains "${candidate_source_root}" "${legacy_source_roots[@]}"; then
+        legacy_source_roots+=("${candidate_source_root}")
       fi
     fi
   done
@@ -224,8 +224,8 @@ cleanup_legacy_prompt_link() {
     legacy_link_target="$(readlink -- "${legacy_link}" 2>/dev/null || true)"
     legacy_link_canonical="$(canonicalize_link_target "${legacy_link}" 2>/dev/null || true)"
 
-    for candidate_root in "${legacy_roots[@]}"; do
-      candidate_target="${candidate_root}/prompts"
+    for candidate_source_root in "${legacy_source_roots[@]}"; do
+      candidate_target="${candidate_source_root}/prompts"
       if [[ "${legacy_link_target}" == "${candidate_target}" ]] || [[ -n "${legacy_link_canonical}" && "${legacy_link_canonical}" == "$(canonicalize_path "${candidate_target}")" ]]; then
         # Re-check the entry immediately before removal; never follow the link.
         if [[ -L "${legacy_link}" ]]; then

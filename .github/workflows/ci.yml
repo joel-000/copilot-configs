@@ -106,6 +106,19 @@ jobs:
           bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
           test ! -L "$copilot_home/prompts"
 
+      - name: Verify global installer removes prior-install legacy prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          old_root="$(mktemp -d)/copilot"
+          ln -s "${old_root}/agents" "$copilot_home/agents"
+          ln -s "${old_root}/instructions" "$copilot_home/instructions"
+          ln -s "${old_root}/skills" "$copilot_home/skills"
+          ln -s "${old_root}/copilot-instructions.md" "$copilot_home/copilot-instructions.md"
+          ln -s "${old_root}/prompts" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          test ! -L "$copilot_home/prompts"
+
       - name: Verify global installer removes canonicalized legacy prompt link
         run: |
           set -euo pipefail

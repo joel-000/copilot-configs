@@ -38,6 +38,42 @@ canonicalize_link_target() {
   fi
 }
 
+copilot_root_from_managed_item_link() {
+  local item="$1"
+  local link_path="${COPILOT_HOME}/${item}"
+  local suffix
+  local target
+
+  if [[ ! -L "${link_path}" ]]; then
+    return 1
+  fi
+
+  case "${item}" in
+    agents|instructions|skills)
+      suffix="/${item}"
+      ;;
+    copilot-instructions.md)
+      suffix="/copilot-instructions.md"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+
+  target="$(readlink -- "${link_path}" 2>/dev/null || true)"
+  if [[ "${target}" == *"${suffix}" ]]; then
+    printf '%s\n' "${target%"${suffix}"}"
+    return 0
+  fi
+
+  if target="$(canonicalize_link_target "${link_path}" 2>/dev/null)" && [[ "${target}" == *"${suffix}" ]]; then
+    printf '%s\n' "${target%"${suffix}"}"
+    return 0
+  fi
+
+  return 1
+}
+
 reject_symlink_components() {
   local path="$1"
   local probe="/"
@@ -110,26 +146,36 @@ validate_source_tree() {
 }
 
 cleanup_legacy_prompt_link() {
+  local candidate_root
+  local candidate_target
+  local item
   local legacy_target="${COPILOT_SOURCE}/prompts"
   local legacy_link_target
   local legacy_link_canonical
-  local legacy_target_canonical
   local legacy_link="${COPILOT_HOME}/prompts"
+  local -a legacy_roots=("${COPILOT_SOURCE}")
 
-  legacy_target_canonical="$(canonicalize_path "${legacy_target}")"
+  for item in "${MANAGED_DIRECTORIES[@]}" "${MANAGED_FILES[@]}"; do
+    if candidate_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)"; then
+      legacy_roots+=("${candidate_root}")
+    fi
+  done
 
   if [[ -L "${legacy_link}" ]]; then
     legacy_link_target="$(readlink -- "${legacy_link}" 2>/dev/null || true)"
-    if [[ "${legacy_link_target}" == "${legacy_target}" ]] || {
-      legacy_link_canonical="$(canonicalize_link_target "${legacy_link}" 2>/dev/null)" &&
-      [[ "${legacy_link_canonical}" == "${legacy_target_canonical}" ]]
-    }; then
-      # Re-check the entry immediately before removal; never follow the link.
-      if [[ -L "${legacy_link}" ]]; then
-        rm -- "${legacy_link}"
-        echo "Removed legacy pack-owned prompt symlink ${legacy_link}"
+    legacy_link_canonical="$(canonicalize_link_target "${legacy_link}" 2>/dev/null || true)"
+
+    for candidate_root in "${legacy_roots[@]}"; do
+      candidate_target="${candidate_root}/prompts"
+      if [[ "${legacy_link_target}" == "${candidate_target}" ]] || [[ -n "${legacy_link_canonical}" && "${legacy_link_canonical}" == "$(canonicalize_path "${candidate_target}")" ]]; then
+        # Re-check the entry immediately before removal; never follow the link.
+        if [[ -L "${legacy_link}" ]]; then
+          rm -- "${legacy_link}"
+          echo "Removed legacy pack-owned prompt symlink ${legacy_link}"
+        fi
+        break
       fi
-    fi
+    done
   fi
 }
 

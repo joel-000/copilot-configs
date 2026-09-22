@@ -100,7 +100,8 @@ jobs:
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
-          legacy_target="$(realpath -m "$(pwd)/copilot/prompts")"
+          repo_root="$(realpath -m "$(pwd)")"
+          legacy_target="${repo_root}/copilot/prompts"
           ln -s "${legacy_target}/../prompts" "$copilot_home/prompts"
           bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
           test ! -L "$copilot_home/prompts"

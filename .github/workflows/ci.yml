@@ -114,7 +114,11 @@ jobs:
           old_root_base="$(mktemp -d)"
           old_root="${old_root_base}/copilot"
           mkdir -p "${old_root}/agents" "${old_root}/instructions" "${old_root}/skills"
-          cp "${repo_root}/copilot/copilot-instructions.md" "${old_root}/copilot-instructions.md"
+          cat > "${old_root}/copilot-instructions.md" <<'EOF'
+          <!-- copilot-config-pack: joel-000/copilot-configs -->
+
+          legacy
+          EOF
           ln -s "${old_root}/agents" "$copilot_home/agents"
           ln -s "${old_root}/instructions" "$copilot_home/instructions"
           ln -s "${old_root}/skills" "$copilot_home/skills"

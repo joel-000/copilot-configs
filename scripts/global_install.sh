@@ -102,7 +102,7 @@ has_pack_marker() {
   local root="$1"
   local marker_file="${root}/copilot-instructions.md"
 
-  [[ -f "${marker_file}" ]] && grep -Fqx "${PACK_MARKER}" "${marker_file}"
+  [[ -f "${marker_file}" ]] && grep -Fq "${PACK_MARKER}" "${marker_file}"
 }
 
 reject_symlink_components() {

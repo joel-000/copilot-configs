@@ -37,7 +37,6 @@ jobs:
           bash scripts/repo_install.sh "$target"
           test -d "$target/.github/agents"
           test -d "$target/.github/instructions"
-          test -d "$target/.github/prompts"
           test -d "$target/.github/skills"
 
       - name: Verify installer idempotency
@@ -81,11 +80,9 @@ jobs:
           bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
           test -L "$copilot_home/instructions"
           test -L "$copilot_home/agents"
-          test -L "$copilot_home/prompts"
           test -L "$copilot_home/skills"
           test "$(readlink "$copilot_home/instructions")" = "$repo_root/copilot/instructions"
           test "$(readlink "$copilot_home/agents")" = "$repo_root/copilot/agents"
-          test "$(readlink "$copilot_home/prompts")" = "$repo_root/copilot/prompts"
           test "$(readlink "$copilot_home/skills")" = "$repo_root/copilot/skills"
           test "$(readlink "$copilot_home/copilot-instructions.md")" = "$repo_root/copilot/copilot-instructions.md"
 
@@ -99,13 +96,21 @@ jobs:
           second_snapshot="$(find "$copilot_home" -mindepth 1 -maxdepth 1 -printf '%f:%l\n' | sort)"
           test "$first_snapshot" = "$second_snapshot"
 
+      - name: Verify global installer removes owned legacy prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          ln -s "$(pwd)/copilot/prompts" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
+          test ! -L "$copilot_home/prompts"
+
       - name: Verify global installer force-replaces conflicts
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
           repo_root="$(pwd)"
-          mkdir -p "$copilot_home/prompts"
-          printf "stale prompt config\n" > "$copilot_home/prompts/old.txt"
+          mkdir -p "$copilot_home/skills"
+          printf "stale skill config\n" > "$copilot_home/skills/old.txt"
           ln -s /tmp/stale-agent-config "$copilot_home/agents"
           if bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"; then
             echo "Expected installer to fail when managed paths conflict without --force."
@@ -113,9 +118,9 @@ jobs:
           fi
           bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
           test -L "$copilot_home/agents"
-          test -L "$copilot_home/prompts"
+          test -L "$copilot_home/skills"
           test "$(readlink "$copilot_home/agents")" = "$repo_root/copilot/agents"
-          test "$(readlink "$copilot_home/prompts")" = "$repo_root/copilot/prompts"
+          test "$(readlink "$copilot_home/skills")" = "$repo_root/copilot/skills"
 
   validator-regression:
     runs-on: ubuntu-latest
@@ -123,10 +128,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Ensure validator fails on broken prompt agent references
+      - name: Ensure validator ignores legacy prompt artifacts
         run: |
           set -euo pipefail
           fixture_file="copilot/prompts/zz-regression-bad-agent.prompt.md"
+          mkdir -p "$(dirname "$fixture_file")"
           cat > "$fixture_file" <<'EOF'
           ---
           name: 'Regression fixture'
@@ -137,13 +143,16 @@ jobs:
           This file intentionally contains an invalid agent reference.
           EOF
 
-          if python scripts/validate.py; then
-            echo "Expected validator failure, but it passed."
+          cleanup() {
             rm -f "$fixture_file"
+            rmdir "$(dirname "$fixture_file")" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          if ! python scripts/validate.py; then
+            echo "Validator should ignore legacy prompt artifacts."
             exit 1
           fi
-
-          rm -f "$fixture_file"
 
       - name: Ensure validator fails on broken handoff agent references
         run: |

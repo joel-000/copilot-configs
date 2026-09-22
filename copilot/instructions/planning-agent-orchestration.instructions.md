@@ -1,6 +1,6 @@
 ---
 description: 'Route planning requests through Implementer and require quality/security plan review before implementation.'
-applyTo: '**/*.prompt.md'
+applyTo: '**/{plan-approved-slice,prepare-pr}.prompt.md'
 ---
 
 # Planning Agent Orchestration Rules

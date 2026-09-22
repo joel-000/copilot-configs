@@ -10,7 +10,7 @@ Instructions for creating effective and maintainable prompt files that guide Git
 ## Scope and Principles
 - Target audience: maintainers and contributors authoring reusable prompts for Copilot Chat.
 - Goals: predictable behaviour, clear expectations, minimal permissions, and portability across repositories.
-- Primary references: VS Code documentation on prompt files and organization-specific conventions.
+- Primary references: the shared Copilot prompt-file format and organization-specific conventions.
 
 ## Frontmatter Requirements
 
@@ -22,7 +22,7 @@ Every prompt file should include YAML frontmatter with the following fields:
 |-------|----------|-------------|
 | `description` | Recommended | A short description of the prompt (single sentence, actionable outcome) |
 | `name` | Optional | The name shown after typing `/` in chat. Defaults to filename if not specified |
-| `agent` | Recommended | The agent to use: `ask`, `edit`, `agent`, or a custom agent name. Defaults to current agent |
+| `agent` | Required in this pack | The custom agent to use. This pack routes prompts through `Implementer`, `Quality Review Test Agent`, or `Security Review Agent`; the validator enforces those names. |
 | `model` | Optional | The language model to use. Defaults to the currently selected model |
 | `tools` | Optional | List of tool/tool set names available for this prompt |
 | `argument-hint` | Optional | Hint text shown in chat input to guide user interaction |
@@ -34,7 +34,7 @@ Every prompt file should include YAML frontmatter with the following fields:
 - Preserve any additional metadata (`language`, `tags`, `visibility`, etc.) required by your organization
 
 ## File Naming and Placement
-- Use kebab-case filenames ending with `.prompt.md` and store them under `.github/prompts/` unless your workspace standard specifies another directory.
+- Use kebab-case filenames ending with `.prompt.md` and store them under `.github/prompts/` unless your workspace standard specifies another directory. Keep prompt bodies and frontmatter within the shared format supported by both VS Code and PyCharm; do not depend on IDE-specific UI actions or metadata.
 - Provide a short filename that communicates the action (for example, `generate-readme.prompt.md` rather than `prompt1.prompt.md`).
 
 ## Body Structure
@@ -57,6 +57,7 @@ Every prompt file should include YAML frontmatter with the following fields:
 
 - Prefer `agent: 'Implementer'` as the default routing choice for this configuration pack.
 - Use `Quality Review Test Agent` and `Security Review Agent` only for explicit gate/review prompts.
+- Although upstream Copilot supports built-in agent values such as `ask`, `edit`, and `agent`, do not use them in this pack because they bypass the configured review topology and fail pack validation.
 - Do not route prompts to specialist orchestration agents unless the repository policy explicitly re-introduces them.
 
 ## Instruction Tone and Style
@@ -81,7 +82,7 @@ Every prompt file should include YAML frontmatter with the following fields:
 - [ ] Output expectations include formatting and storage details.
 - [ ] Validation steps are actionable (commands, diff checks, review prompts).
 - [ ] Security, compliance, and privacy policies referenced by the prompt are current.
-- [ ] Prompt executes successfully in VS Code (`Chat: Run Prompt`) using representative scenarios.
+- [ ] Prompt executes successfully in both VS Code and PyCharm using representative scenarios.
 
 ## Maintenance Guidance
 - Version-control prompts alongside the code they affect; update them when dependencies, tooling, or review processes change.
@@ -89,6 +90,6 @@ Every prompt file should include YAML frontmatter with the following fields:
 - Coordinate with other repositories: when a prompt proves broadly useful, extract common guidance into instruction files or shared prompt packs.
 
 ## Additional Resources
-- [Prompt Files Documentation](https://code.visualstudio.com/docs/copilot/customization/prompt-files#_prompt-file-format)
+- [Prompt Files Documentation](https://code.visualstudio.com/docs/agent-customization/prompt-files)
 - [Awesome Copilot Prompt Files](https://github.com/github/awesome-copilot/tree/main/prompts)
-- [Tool Configuration](https://code.visualstudio.com/docs/copilot/chat/chat-agent-mode#_agent-mode-tools)
+- [Tool Configuration](https://code.visualstudio.com/docs/agent-customization/custom-agents)

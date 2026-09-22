@@ -58,7 +58,7 @@ bash scripts/repo_install.sh --help
 
 ## Install globally
 
-Create user-level symlinks so VS Code and PyCharm use this repository's current Copilot config.
+Create user-level symlinks so VS Code and PyCharm can use this repository's current Copilot config. The pack uses shared frontmatter and Markdown conventions; IDE-specific features are not required.
 
 ```bash
 bash scripts/global_install.sh

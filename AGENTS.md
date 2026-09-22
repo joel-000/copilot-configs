@@ -4,6 +4,7 @@
 - This repository is a **Copilot configuration pack**, not an application. The real payload is `copilot/`, which can be linked globally or copied into other repositories.
 - Treat `copilot/` as the **source of truth**. Root files like `README.md` explain the pack; they are not what gets installed.
 - The enforced pack layout is `copilot/{agents,instructions,prompts,skills}` plus `copilot/copilot-instructions.md`.
+- All managed artifacts must remain compatible with both VS Code and PyCharm. Prefer shared Copilot frontmatter and Markdown conventions; do not rely on IDE-specific metadata, UI actions, or tool declarations.
 
 ## Architecture and data flow
 - `scripts/repo_install.sh` copies `copilot/` into a target repository’s `.github/` directory using `rsync`.

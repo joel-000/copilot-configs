@@ -40,8 +40,8 @@ canonicalize_link_target() {
 
 copilot_root_from_managed_item_link() {
   local item="$1"
+  local expected_basename
   local link_path="${COPILOT_HOME}/${item}"
-  local suffix
   local target
 
   if [[ ! -L "${link_path}" ]]; then
@@ -50,10 +50,10 @@ copilot_root_from_managed_item_link() {
 
   case "${item}" in
     agents|instructions|skills)
-      suffix="/${item}"
+      expected_basename="${item}"
       ;;
     copilot-instructions.md)
-      suffix="/copilot-instructions.md"
+      expected_basename="copilot-instructions.md"
       ;;
     *)
       return 1
@@ -61,13 +61,13 @@ copilot_root_from_managed_item_link() {
   esac
 
   target="$(readlink -- "${link_path}" 2>/dev/null || true)"
-  if [[ "${target}" == *"${suffix}" ]]; then
-    printf '%s\n' "${target%"${suffix}"}"
+  if [[ "${target}" == /* ]] && [[ "$(basename -- "${target}")" == "${expected_basename}" ]]; then
+    dirname -- "${target}"
     return 0
   fi
 
-  if target="$(canonicalize_link_target "${link_path}" 2>/dev/null)" && [[ "${target}" == *"${suffix}" ]]; then
-    printf '%s\n' "${target%"${suffix}"}"
+  if target="$(canonicalize_link_target "${link_path}" 2>/dev/null)" && [[ "$(basename -- "${target}")" == "${expected_basename}" ]]; then
+    dirname -- "${target}"
     return 0
   fi
 

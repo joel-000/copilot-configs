@@ -143,7 +143,7 @@ jobs:
           copilot_home="$(mktemp -d)"
           unrelated_root="$(mktemp -d)/copilot"
           unrelated_prompts_target="$(mktemp -d)/custom-prompts"
-          mkdir -p "${unrelated_root}/agents" "${unrelated_root}/instructions" "${unrelated_root}/skills"
+          mkdir -p "${unrelated_root}/agents" "${unrelated_root}/instructions" "${unrelated_root}/skills" "${unrelated_prompts_target}"
           printf "legacy\n" > "${unrelated_root}/copilot-instructions.md"
           ln -s "${unrelated_root}/agents" "$copilot_home/agents"
           ln -s "${unrelated_prompts_target}" "$copilot_home/prompts"

@@ -1,6 +1,6 @@
 ---
 name: tdd-red-green
-description: "Use when practicing TDD with pytest and Hypothesis, test-first development, red-green-refactor, or when you want the agent to write an adversarial failing test first and then the minimum defensive code needed to make it pass."
+description: "Use for a strict test-first red-green-refactor cycle that changes both tests and production code, including pytest and Hypothesis work; use pytest-unit-test-workflow for test-only work."
 argument-hint: "Describe the behavior, bug fix, or feature to implement with TDD"
 ---
 

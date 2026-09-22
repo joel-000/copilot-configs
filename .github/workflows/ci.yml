@@ -37,7 +37,6 @@ jobs:
           bash scripts/repo_install.sh "$target"
           test -d "$target/.github/agents"
           test -d "$target/.github/instructions"
-          test -d "$target/.github/prompts"
           test -d "$target/.github/skills"
 
       - name: Verify installer idempotency
@@ -81,11 +80,9 @@ jobs:
           bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
           test -L "$copilot_home/instructions"
           test -L "$copilot_home/agents"
-          test -L "$copilot_home/prompts"
           test -L "$copilot_home/skills"
           test "$(readlink "$copilot_home/instructions")" = "$repo_root/copilot/instructions"
           test "$(readlink "$copilot_home/agents")" = "$repo_root/copilot/agents"
-          test "$(readlink "$copilot_home/prompts")" = "$repo_root/copilot/prompts"
           test "$(readlink "$copilot_home/skills")" = "$repo_root/copilot/skills"
           test "$(readlink "$copilot_home/copilot-instructions.md")" = "$repo_root/copilot/copilot-instructions.md"
 
@@ -99,13 +96,83 @@ jobs:
           second_snapshot="$(find "$copilot_home" -mindepth 1 -maxdepth 1 -printf '%f:%l\n' | sort)"
           test "$first_snapshot" = "$second_snapshot"
 
+      - name: Verify global installer removes owned legacy prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          repo_root="$(realpath -m "$(pwd)")"
+          legacy_target="${repo_root}/copilot/prompts"
+          ln -s "${legacy_target}" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
+          test ! -L "$copilot_home/prompts"
+
+      - name: Verify global installer removes prior-install legacy prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          repo_root="$(realpath -m "$(pwd)")"
+          old_root_base="$(mktemp -d)"
+          old_root="${old_root_base}/copilot"
+          mkdir -p "${old_root}/agents" "${old_root}/instructions" "${old_root}/skills" "${old_root}/prompts"
+          cat > "${old_root}/copilot-instructions.md" <<'EOF'
+          <!-- copilot-config-pack: joel-000/copilot-configs -->
+
+          legacy
+          EOF
+          ln -s "${old_root}/agents" "$copilot_home/agents"
+          ln -s "${old_root}/instructions" "$copilot_home/instructions"
+          ln -s "${old_root}/skills" "$copilot_home/skills"
+          ln -s "${old_root}/copilot-instructions.md" "$copilot_home/copilot-instructions.md"
+          ln -s "${old_root}/prompts" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          test ! -L "$copilot_home/prompts"
+
+      - name: Verify global installer removes canonicalized legacy prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          repo_root="$(realpath -m "$(pwd)")"
+          legacy_target="${repo_root}/copilot/prompts"
+          ln -s "${legacy_target}/../prompts" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
+          test ! -L "$copilot_home/prompts"
+
+      - name: Verify global installer preserves unrelated prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          unrelated_root="$(mktemp -d)/copilot"
+          unrelated_prompts_target="$(mktemp -d)/custom-prompts"
+          mkdir -p "${unrelated_root}/agents" "${unrelated_root}/instructions" "${unrelated_root}/skills" "${unrelated_prompts_target}"
+          printf "legacy\n" > "${unrelated_root}/copilot-instructions.md"
+          ln -s "${unrelated_root}/agents" "$copilot_home/agents"
+          ln -s "${unrelated_prompts_target}" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          test -L "$copilot_home/prompts"
+          test "$(readlink "$copilot_home/prompts")" = "${unrelated_prompts_target}"
+
+      - name: Verify global installer preserves unrelated prompt-era pack link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          unrelated_root="$(mktemp -d)/copilot"
+          mkdir -p "${unrelated_root}/agents" "${unrelated_root}/instructions" "${unrelated_root}/prompts"
+          printf "legacy\n" > "${unrelated_root}/copilot-instructions.md"
+          ln -s "${unrelated_root}/agents" "$copilot_home/agents"
+          ln -s "${unrelated_root}/instructions" "$copilot_home/instructions"
+          ln -s "${unrelated_root}/copilot-instructions.md" "$copilot_home/copilot-instructions.md"
+          ln -s "${unrelated_root}/prompts" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          test -L "$copilot_home/prompts"
+          test "$(readlink "$copilot_home/prompts")" = "${unrelated_root}/prompts"
+
       - name: Verify global installer force-replaces conflicts
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
           repo_root="$(pwd)"
-          mkdir -p "$copilot_home/prompts"
-          printf "stale prompt config\n" > "$copilot_home/prompts/old.txt"
+          mkdir -p "$copilot_home/skills"
+          printf "stale skill config\n" > "$copilot_home/skills/old.txt"
           ln -s /tmp/stale-agent-config "$copilot_home/agents"
           if bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"; then
             echo "Expected installer to fail when managed paths conflict without --force."
@@ -113,9 +180,9 @@ jobs:
           fi
           bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
           test -L "$copilot_home/agents"
-          test -L "$copilot_home/prompts"
+          test -L "$copilot_home/skills"
           test "$(readlink "$copilot_home/agents")" = "$repo_root/copilot/agents"
-          test "$(readlink "$copilot_home/prompts")" = "$repo_root/copilot/prompts"
+          test "$(readlink "$copilot_home/skills")" = "$repo_root/copilot/skills"
 
   validator-regression:
     runs-on: ubuntu-latest
@@ -123,27 +190,21 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Ensure validator fails on broken prompt agent references
+      - name: Ensure repository contains no legacy prompt artifacts
         run: |
           set -euo pipefail
-          fixture_file="copilot/prompts/zz-regression-bad-agent.prompt.md"
-          cat > "$fixture_file" <<'EOF'
-          ---
-          name: 'Regression fixture'
-          description: 'Intentionally invalid prompt for validator regression checks'
-          agent: 'Nonexistent Agent Name'
-          ---
-
-          This file intentionally contains an invalid agent reference.
-          EOF
-
-          if python scripts/validate.py; then
-            echo "Expected validator failure, but it passed."
-            rm -f "$fixture_file"
+          if [[ -e copilot/prompts ]]; then
+            echo "Legacy copilot/prompts tree must not exist."
             exit 1
           fi
-
-          rm -f "$fixture_file"
+          if find copilot -path '*/prompts/*.prompt.md' -print | grep -q .; then
+            echo "Legacy prompt artifacts must not exist under copilot/."
+            exit 1
+          fi
+          if grep -RInE 'applyTo:.*(prompts/|\.prompt\.md)' copilot; then
+            echo "Prompt-targeting applyTo globs must not exist under copilot/."
+            exit 1
+          fi
 
       - name: Ensure validator fails on broken handoff agent references
         run: |

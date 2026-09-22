@@ -1,6 +1,6 @@
 ---
 description: 'Enforce the simplified agent topology: Implementer plus independent QA and Security gates.'
-applyTo: '**/*.{agent.md,prompt.md,instructions.md}'
+applyTo: '**/*.{agent.md,instructions.md}'
 ---
 
 # Agent Topology Policy

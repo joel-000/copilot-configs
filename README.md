@@ -2,7 +2,7 @@
 
 # Copilot Configuration Pack
 
-Reusable GitHub Copilot configuration files that can be copied into new repositories as a starting point for prompts, instructions, agents, and skills.
+Reusable GitHub Copilot configuration files that can be copied into new repositories as a starting point for instructions, agents, and skills.
 
 ## What this repository contains
 
@@ -12,7 +12,6 @@ The source of truth lives under `copilot/`. Its contents map directly to `~/.cop
 | --- | --- |
 | `copilot/agents/` | Custom agents for planning, context compression, implementation, review, testing, security, Terraform, and terminal help |
 | `copilot/instructions/` | Reusable instruction files scoped by file type or workflow |
-| `copilot/prompts/` | Prompt entry points wired to specific agents |
 | `copilot/skills/` | Reusable skills for common workflows |
 | `copilot/copilot-instructions.md` | Global Copilot instructions |
 | `scripts/repo_install.sh` | Installer that copies the pack into a repository |
@@ -25,7 +24,6 @@ The source of truth lives under `copilot/`. Its contents map directly to `~/.cop
 copilot/
 ├── agents/
 ├── instructions/
-├── prompts/
 ├── skills/
 └── copilot-instructions.md
 ```
@@ -74,7 +72,6 @@ This links:
 
 - `~/.copilot/instructions` -> `copilot/instructions`
 - `~/.copilot/agents` -> `copilot/agents`
-- `~/.copilot/prompts` -> `copilot/prompts`
 - `~/.copilot/skills` -> `copilot/skills`
 - `~/.copilot/copilot-instructions.md` -> `copilot/copilot-instructions.md`
 
@@ -95,12 +92,11 @@ python scripts/validate.py
 The validator currently checks:
 
 - expected `copilot/` subdirectories exist
-- required frontmatter keys exist on agents, instructions, prompts, and skills
+- required frontmatter keys exist on agents, instructions, and skills
 - agent handoff `agent` references resolve to real agent names or agent file IDs
-- prompt `agent` references resolve to real agent names
 - duplicate agent names are not introduced
 - symlink artifacts are rejected under `copilot/`
-- repository-level `.github/` agents, instructions, and prompts also keep valid frontmatter and internal references
+- repository-level `.github/` agents and instructions also keep valid frontmatter and internal references
 
 ## Maintenance guidance
 
@@ -108,8 +104,13 @@ The validator currently checks:
 - Do not rely on automatic synchronization between root `.github/` and `copilot/`; root-level files are optional local artifacts.
 - Prefer additive installs by default; only use `--prune` when you intend to remove unmanaged target files.
 - When adding or changing an agent handoff, validate that its `agent` value matches an agent `name` or agent filename without `.agent.md`.
-- When adding a new prompt, validate that its `agent` value exactly matches an agent `name`.
 - When adding a new configuration artifact, include complete frontmatter so the validator can enforce consistency.
+- Repository installs are safe-merge by default and do not remove existing
+  `.github/prompts` files. To clean stale copies, remove the five legacy files
+  (`add-fastapi-endpoint.prompt.md`, `improve-docker-setup.prompt.md`,
+  `plan-approved-slice.prompt.md`, `prepare-pr.prompt.md`, and
+  `review-terraform-plan.prompt.md`) explicitly, or inspect the destination
+  first and use the repository's confirmed prune flow.
 
 ## Recommended workflow for updates
 
@@ -124,17 +125,17 @@ Review the copied `.github/` tree in the smoke-test directory before distributin
 
 ### Safe workflow order
 
-1. Start with plan-approved-slice prompt.
-2. Confirm approved slice before deeper planning or implementation.
+1. Start with the Implementer approval checkpoint.
+2. Confirm the approved slice before deeper planning or implementation.
 3. Build a `Context Snapshot`, then generate the detailed implementation plan.
 4. Pass compact handoff packets between stages (approved slice, snapshot, delta, gate results) instead of replaying full transcripts.
 5. Run `python scripts/validate.py`.
 6. Run `bash scripts/repo_install.sh <smoke-test-dir>` without `--prune`.
-7. Review installed `.github` tree before broader rollout.
+7. Review the installed `.github` tree before broader rollout.
 
 ### Acceptance criteria
 
-- [ ] **Pass:** Prompt explicitly uses a plan-approved slice. **Fail:** Prompt is broad or unscoped.
+- [ ] **Pass:** Implementer explicitly uses an approved slice. **Fail:** Work is broad or unscoped.
 - [ ] **Pass:** Context building happens before detailed implementation planning. **Fail:** Downstream agents re-scan the repo instead of reusing a snapshot.
 - [ ] **Pass:** Stage handoffs stay compact and delta-based. **Fail:** Later stages restate full prior outputs without need.
 - [ ] **Pass:** Implementation confirms the approved slice before edits. **Fail:** Work starts without scope confirmation.

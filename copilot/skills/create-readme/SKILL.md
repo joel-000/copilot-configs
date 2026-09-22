@@ -1,6 +1,6 @@
 ---
 name: create-readme
-description: 'Create a README.md file for the project'
+description: 'Use when creating or refreshing only a project README.md file.'
 ---
 
 ## Role
@@ -9,7 +9,11 @@ You're a senior expert software engineer with extensive experience in open sourc
 
 ## Task
 
-1. Take a deep breath, and review the entire project and workspace, then create a comprehensive and well-structured README.md file for the project.
+This skill owns README creation and refreshes only. Use `documentation-writer`
+for tutorials, how-to guides, reference, explanation, or other non-README
+documentation.
+
+1. Review only the repository evidence needed to understand the project's purpose, setup, usage, and other README-relevant details, then create a comprehensive and well-structured README.md file for the project.
 2. Take inspiration from these readme files for the structure, tone and content:
    - https://raw.githubusercontent.com/Azure-Samples/serverless-chat-langchainjs/refs/heads/main/README.md
    - https://raw.githubusercontent.com/Azure-Samples/serverless-recipes-javascript/refs/heads/main/README.md

@@ -10,7 +10,7 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 ROOT = Path(__file__).resolve().parent.parent
 COPILOT_ROOT = ROOT / "copilot"
-REQUIRED_SUBDIRS = ("agents", "instructions", "prompts", "skills")
+REQUIRED_SUBDIRS = ("agents", "instructions", "skills")
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---", re.S)
 KEY_RE = re.compile(r"^(\w[\w-]*):", re.M)
 
@@ -139,24 +139,6 @@ def validate_instructions_dir(instructions_dir: Path, errors: List[str]) -> None
         check_required_keys(path, ("description", "applyTo"), errors)
 
 
-def validate_prompts_dir(
-    prompts_dir: Path, agent_names: Dict[str, Path], errors: List[str]
-) -> None:
-    if not prompts_dir.is_dir():
-        return
-
-    for path in sorted(prompts_dir.glob("*.prompt.md")):
-        result = check_required_keys(path, ("name", "description", "agent"), errors)
-        if not result:
-            continue
-        _, frontmatter = result
-        agent = extract_scalar(frontmatter, "agent")
-        if not agent:
-            errors.append(f"missing parseable agent reference in {path}")
-        elif agent not in agent_names:
-            errors.append(f"unknown prompt agent {agent!r} in {path}")
-
-
 def validate_skills_dir(skills_dir: Path, errors: List[str]) -> None:
     if not skills_dir.is_dir():
         return
@@ -182,7 +164,6 @@ def main() -> int:
     )
     validate_agent_handoffs(agent_names, agent_ids, agent_records, errors)
     validate_instructions_dir(COPILOT_ROOT / "instructions", errors)
-    validate_prompts_dir(COPILOT_ROOT / "prompts", agent_names, errors)
     validate_skills_dir(COPILOT_ROOT / "skills", errors)
 
     if errors:

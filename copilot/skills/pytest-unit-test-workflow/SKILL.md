@@ -1,6 +1,6 @@
 ---
 name: pytest-unit-test-workflow
-description: Use when adding, fixing or reviewing pytest tests for Python, FastAPI or AWS-integrated code.
+description: Use for test-only additions, fixes, or reviews of pytest tests for Python, FastAPI, or AWS-integrated code; use tdd-red-green when production behavior also changes.
 ---
 
 # Pytest Unit Test Workflow
@@ -15,4 +15,6 @@ description: Use when adding, fixing or reviewing pytest tests for Python, FastA
    - expected exceptions
    - boundary cases
 6. Run the narrowest pytest command first.
-7. If failures occur, fix the implementation or test based on behaviour, not snapshots of internals.
+7. If failures occur, fix the test or fixture when the test is wrong. If the
+   behaviour must change in production code, stop and hand off to
+   `tdd-red-green`.

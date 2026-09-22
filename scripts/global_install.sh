@@ -3,7 +3,7 @@ set -euo pipefail
 
 SOURCE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COPILOT_SOURCE="${SOURCE_ROOT}/copilot"
-MANAGED_DIRECTORIES=(instructions agents prompts skills)
+MANAGED_DIRECTORIES=(instructions agents skills)
 MANAGED_FILES=(copilot-instructions.md)
 
 COPILOT_HOME="${HOME}/.copilot"
@@ -95,6 +95,19 @@ validate_source_tree() {
       exit 1
     fi
   done
+}
+
+cleanup_legacy_prompt_link() {
+  local legacy_target="${COPILOT_SOURCE}/prompts"
+  local legacy_link="${COPILOT_HOME}/prompts"
+
+  if [[ -L "${legacy_link}" ]] && [[ "$(readlink -- "${legacy_link}")" == "${legacy_target}" ]]; then
+    # Re-check the entry immediately before removal; never follow the link.
+    if [[ -L "${legacy_link}" ]]; then
+      rm -- "${legacy_link}"
+      echo "Removed legacy pack-owned prompt symlink ${legacy_link}"
+    fi
+  fi
 }
 
 prepare_copilot_home() {
@@ -209,6 +222,7 @@ main() {
   parse_arguments "$@"
   validate_source_tree
   prepare_copilot_home
+  cleanup_legacy_prompt_link
   install_managed_items
 
   echo "Linked global Copilot customisations under ${COPILOT_HOME}"

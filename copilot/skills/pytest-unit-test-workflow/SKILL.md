@@ -1,6 +1,6 @@
 ---
 name: pytest-unit-test-workflow
-description: Use when adding, fixing or reviewing pytest tests for Python, FastAPI or AWS-integrated code.
+description: Use for test-only additions, fixes, or reviews of pytest tests for Python, FastAPI, or AWS-integrated code; use tdd-red-green when production behavior also changes.
 ---
 
 # Pytest Unit Test Workflow

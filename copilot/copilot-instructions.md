@@ -1,5 +1,12 @@
 # Repository Instructions
 
+## Universal approval boundary
+
+Before deeper planning or implementation, identify the goal, largest
+uncertainty, and smallest useful slice, then obtain explicit user approval.
+No skill-selection result may bypass this no-edit boundary. Detailed gate,
+re-review, and waiver mechanics belong to `agent-topology.instructions.md`.
+
 ## Maintainability
 
 This repository is maintained by multiple developers. Code must be understandable without access to the task conversation that produced it.

@@ -113,7 +113,7 @@ jobs:
           repo_root="$(realpath -m "$(pwd)")"
           old_root_base="$(mktemp -d)"
           old_root="${old_root_base}/copilot"
-          mkdir -p "${old_root}/agents" "${old_root}/instructions" "${old_root}/skills"
+          mkdir -p "${old_root}/agents" "${old_root}/instructions" "${old_root}/skills" "${old_root}/prompts"
           cat > "${old_root}/copilot-instructions.md" <<'EOF'
           <!-- copilot-config-pack: joel-000/copilot-configs -->
 

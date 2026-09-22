@@ -43,7 +43,11 @@ copilot_source_root_from_link_target() {
   local target="$1"
   local managed_basename="$2"
 
-  printf '%s\n' "${target%/${managed_basename}}"
+  if [[ "$(basename -- "${target}")" != "${managed_basename}" ]]; then
+    return 1
+  fi
+
+  dirname -- "${target}"
 }
 
 copilot_root_from_managed_item_link() {

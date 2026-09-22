@@ -178,8 +178,16 @@ jobs:
       - name: Ensure repository contains no legacy prompt artifacts
         run: |
           set -euo pipefail
+          if [[ -e copilot/prompts ]]; then
+            echo "Legacy copilot/prompts tree must not exist."
+            exit 1
+          fi
           if find copilot -path '*/prompts/*.prompt.md' -print | grep -q .; then
             echo "Legacy prompt artifacts must not exist under copilot/."
+            exit 1
+          fi
+          if grep -RInE 'applyTo:.*(prompts/|\.prompt\.md)' copilot; then
+            echo "Prompt-targeting applyTo globs must not exist under copilot/."
             exit 1
           fi
 

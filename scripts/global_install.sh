@@ -105,6 +105,20 @@ has_pack_marker() {
   [[ -f "${marker_file}" ]] && grep -Fq "${PACK_MARKER}" "${marker_file}"
 }
 
+array_contains() {
+  local needle="$1"
+  shift
+  local item
+
+  for item in "$@"; do
+    if [[ "${item}" == "${needle}" ]]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 reject_symlink_components() {
   local path="$1"
   local probe="/"
@@ -193,7 +207,9 @@ cleanup_legacy_prompt_link() {
 
   for item in "${MANAGED_DIRECTORIES[@]}" "${MANAGED_FILES[@]}"; do
     if candidate_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)" && is_valid_pack_root "${candidate_root}" && has_pack_marker "${candidate_root}"; then
-      legacy_roots+=("${candidate_root}")
+      if ! array_contains "${candidate_root}" "${legacy_roots[@]}"; then
+        legacy_roots+=("${candidate_root}")
+      fi
     fi
   done
 

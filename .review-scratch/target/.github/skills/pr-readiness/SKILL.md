@@ -8,7 +8,7 @@ description: Use when assessing whether a change is ready for review or preparin
 Assess the current `git status`, including untracked files, and the current
 diff against the approved slice and acceptance criteria.
 Reuse current gate verdicts under
-`../../instructions/agent-topology.instructions.md`; request re-review only
+`copilot/instructions/agent-topology.instructions.md`; request re-review only
 when the delta is material to that gate.
 
 Do not stage, commit, push, open, update, or merge a pull request. Commit

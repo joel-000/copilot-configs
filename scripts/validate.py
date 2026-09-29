@@ -147,6 +147,11 @@ def validate_skills_dir(skills_dir: Path, errors: List[str]) -> None:
         check_required_keys(path, ("name", "description"), errors)
 
 
+def check_for_prompt_artifacts(base_dir: Path, errors: List[str]) -> None:
+    for path in sorted(base_dir.rglob("*.prompt.md")):
+        errors.append(f"legacy prompt artifacts are not allowed: {path}")
+
+
 def main() -> int:
     errors: List[str] = []
 
@@ -158,6 +163,7 @@ def main() -> int:
             if not subdir.is_dir():
                 errors.append(f"missing expected directory: {subdir}")
         check_for_symlinks(COPILOT_ROOT, errors)
+        check_for_prompt_artifacts(COPILOT_ROOT, errors)
 
     agent_names, agent_ids, agent_records = collect_agent_records(
         COPILOT_ROOT / "agents", errors

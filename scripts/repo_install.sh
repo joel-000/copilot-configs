@@ -11,6 +11,12 @@ LEGACY_REPO_ARTIFACTS=(
   "prompts/review-terraform-plan.prompt.md"
   "instructions/prompt.instructions.md"
 )
+LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_add_fastapi_endpoint_prompt_md="6a92fcfef421793f09851ff1a9b5b027315deaadc011577d375782c709944532"
+LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_improve_docker_setup_prompt_md="945f5a0e4d1f196b52fd68f02a8380f97ce450e8b0c1d74835e5f34d692b31b3"
+LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_plan_approved_slice_prompt_md="ee74c3123a064767831fc6afb1269174c0c9b491e88e9542449061047edd94f2"
+LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_prepare_pr_prompt_md="db1d65293c7fd25ba107c18dbae4962aa9c45ae6086b62b20ed659a8fd516bec"
+LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_review_terraform_plan_prompt_md="7af159aaa67fa2195c02c0ca67ca11e34c1f5d5b6ad8bb5f74308fb880a7d8d0"
+LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_prompt_instructions_md="2516ce4be48906f49de0c41a917b6f124abcee4920f47dcd537140cc91b0b09c"
 
 usage() {
   cat <<'EOF'
@@ -102,22 +108,22 @@ path_has_symlink_component() {
 legacy_repo_artifact_object_id() {
   case "$1" in
     prompts/add-fastapi-endpoint.prompt.md)
-      printf '%s\n' '1f7fe408cf3e844123be9e75d7321cee8140d365'
+      printf '%s\n' "${LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_add_fastapi_endpoint_prompt_md}"
       ;;
     prompts/improve-docker-setup.prompt.md)
-      printf '%s\n' 'a5e20180c007954a3e2525425172eb46aab7f609'
+      printf '%s\n' "${LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_improve_docker_setup_prompt_md}"
       ;;
     prompts/plan-approved-slice.prompt.md)
-      printf '%s\n' '189d65fa7df693aa21218c12c555a70f9fbe9ecd'
+      printf '%s\n' "${LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_plan_approved_slice_prompt_md}"
       ;;
     prompts/prepare-pr.prompt.md)
-      printf '%s\n' '0bd41553923195b36b2be6fd6640607a741c81c5'
+      printf '%s\n' "${LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_prepare_pr_prompt_md}"
       ;;
     prompts/review-terraform-plan.prompt.md)
-      printf '%s\n' '0bd69407aa0a04bdd38de68445b9c9ef1fd4f2d9'
+      printf '%s\n' "${LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_review_terraform_plan_prompt_md}"
       ;;
     instructions/prompt.instructions.md)
-      printf '%s\n' 'ec147a2095b8fc2848ce9676acde3031532d7b98'
+      printf '%s\n' "${LEGACY_REPO_ARTIFACT_NORMALIZED_SHA256_prompt_instructions_md}"
       ;;
     *)
       return 1
@@ -129,9 +135,11 @@ is_pack_owned_legacy_repo_artifact() {
   local relative_path="$1"
   local artifact_path="$2"
   local expected_object_id
+  local artifact_sha
 
   expected_object_id="$(legacy_repo_artifact_object_id "${relative_path}")" || return 1
-  [[ "$(git hash-object -- "${artifact_path}")" == "${expected_object_id}" ]]
+  artifact_sha="$(python -c 'import hashlib, sys; print(hashlib.sha256(open(sys.argv[1], "rb").read().replace(b"\r\n", b"\n")).hexdigest())' "${artifact_path}")"
+  [[ "${artifact_sha}" == "${expected_object_id}" ]]
 }
 
 cleanup_legacy_repo_artifacts() {

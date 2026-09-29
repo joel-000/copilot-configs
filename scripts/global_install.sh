@@ -6,7 +6,7 @@ COPILOT_SOURCE="${SOURCE_ROOT}/copilot"
 MANAGED_DIRECTORIES=(instructions agents skills)
 MANAGED_FILES=(copilot-instructions.md)
 PACK_MARKER="<!-- copilot-config-pack: joel-000/copilot-configs -->"
-LEGACY_PACK_INSTRUCTIONS_SHA256="0fafb8a194b7db9a41aa9bbd747a1894b05e1907adfffcc4527aa006ed8857fd"
+LEGACY_PACK_INSTRUCTIONS_NORMALIZED_SHA256="0fafb8a194b7db9a41aa9bbd747a1894b05e1907adfffcc4527aa006ed8857fd"
 
 COPILOT_HOME="${HOME}/.copilot"
 FORCE=false
@@ -133,8 +133,8 @@ has_legacy_pack_instructions() {
   local instructions_sha
 
   [[ -f "${instructions_file}" ]] || return 1
-  instructions_sha="$(sha256sum -- "${instructions_file}" | awk '{print $1}')"
-  [[ "${instructions_sha}" == "${LEGACY_PACK_INSTRUCTIONS_SHA256}" ]]
+  instructions_sha="$(python -c 'import hashlib, sys; print(hashlib.sha256(open(sys.argv[1], "rb").read().replace(b"\r\n", b"\n")).hexdigest())' "${instructions_file}")"
+  [[ "${instructions_sha}" == "${LEGACY_PACK_INSTRUCTIONS_NORMALIZED_SHA256}" ]]
 }
 
 array_contains() {

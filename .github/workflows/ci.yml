@@ -537,7 +537,7 @@ Every prompt file should include YAML frontmatter with the following fields:
             echo "Legacy copilot/prompts tree must not exist."
             exit 1
           fi
-          if find copilot -path '*/prompts/*.prompt.md' -print | grep -q .; then
+          if find copilot -type f -name '*.prompt.md' -print | grep -q .; then
             echo "Legacy prompt artifacts must not exist under copilot/."
             exit 1
           fi

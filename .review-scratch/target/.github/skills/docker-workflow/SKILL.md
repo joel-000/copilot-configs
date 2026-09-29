@@ -10,14 +10,14 @@ description: Use when improving Dockerfiles, Compose files, image size, build re
 2. State the goal, largest uncertainty, smallest useful slice, and wait for
    explicit approval before deeper planning or edits.
 3. For a material plan, follow the review gates in
-   `../../instructions/agent-topology.instructions.md` and do not implement
+   `copilot/instructions/agent-topology.instructions.md` and do not implement
    until the required gates pass or are explicitly waived.
 4. After approval and any required gate pass or waiver, make the smallest
    change that addresses the approved slice. Apply the
    Docker standards in
-   `../../instructions/containerization-docker-best-practices.instructions.md`
+   `copilot/instructions/containerization-docker-best-practices.instructions.md`
    and platform-security guidance in
-   `../../instructions/security-and-owasp-platform.instructions.md`.
+   `copilot/instructions/security-and-owasp-platform.instructions.md`.
 5. Run the smallest available relevant build, configuration, lint, or runtime
    checks, and report unavailable checks as not run.
 6. Run applicable quality and security gates, using topology policy for

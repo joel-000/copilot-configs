@@ -62,10 +62,11 @@
   bash scripts/global_install.sh --help
   ```
 
-- Repository installation is safe-merge by default and does not remove
-  already-copied `.github/prompts` files. Remove the five known legacy prompt
-  files explicitly, or inspect the destination before using the repository's
-  confirmed `--prune` flow.
+- Repository installation is safe-merge by default. It removes the five known
+  legacy `.github/prompts/*.prompt.md` files plus
+  `.github/instructions/prompt.instructions.md` during upgrade, while
+  preserving unrelated target files. Use the repository's confirmed `--prune`
+  flow only when exact mirroring is intended.
 
 ## Project-specific gotchas
 - `scripts/repo_install.sh` depends on `rsync` being available.

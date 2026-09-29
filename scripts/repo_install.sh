@@ -3,6 +3,14 @@ set -euo pipefail
 
 SOURCE_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 COPILOT_SOURCE="${SOURCE_ROOT}/copilot"
+LEGACY_REPO_ARTIFACTS=(
+  "prompts/add-fastapi-endpoint.prompt.md"
+  "prompts/improve-docker-setup.prompt.md"
+  "prompts/plan-approved-slice.prompt.md"
+  "prompts/prepare-pr.prompt.md"
+  "prompts/review-terraform-plan.prompt.md"
+  "instructions/prompt.instructions.md"
+)
 
 usage() {
   cat <<'EOF'
@@ -70,6 +78,46 @@ assert_no_symlink_chain() {
       exit 1
     fi
   done
+}
+
+path_has_symlink_component() {
+  local path="$1"
+  local absolute_path
+  local probe="/"
+  local part
+
+  absolute_path="$(to_absolute_path "${path}")"
+  IFS='/' read -r -a parts <<< "${absolute_path#/}"
+  for part in "${parts[@]}"; do
+    [[ -z "${part}" ]] && continue
+    probe="${probe%/}/${part}"
+    if [[ -L "${probe}" ]]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
+cleanup_legacy_repo_artifacts() {
+  local relative_path
+  local artifact_path
+
+  for relative_path in "${LEGACY_REPO_ARTIFACTS[@]}"; do
+    artifact_path="${TARGET_GITHUB_CANONICAL}/${relative_path}"
+    if [[ ! -e "${artifact_path}" && ! -L "${artifact_path}" ]]; then
+      continue
+    fi
+    if path_has_symlink_component "${artifact_path}"; then
+      echo "Skipped legacy artifact cleanup for symlinked path: ${artifact_path}" >&2
+      continue
+    fi
+    rm -f -- "${artifact_path}"
+  done
+
+  if ! path_has_symlink_component "${TARGET_GITHUB_CANONICAL}/prompts"; then
+    rmdir --ignore-fail-on-non-empty -- "${TARGET_GITHUB_CANONICAL}/prompts" 2>/dev/null || true
+  fi
 }
 
 while [[ $# -gt 0 ]]; do
@@ -204,6 +252,8 @@ rsync "${RSYNC_ARGS[@]}" \
   -- \
   "${COPILOT_SOURCE}/" \
   "${TARGET_GITHUB_CANONICAL}/"
+
+cleanup_legacy_repo_artifacts
 
 MODE="merged safely"
 if [[ "${PRUNE}" == true ]]; then

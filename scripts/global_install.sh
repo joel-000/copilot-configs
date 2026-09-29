@@ -6,6 +6,7 @@ COPILOT_SOURCE="${SOURCE_ROOT}/copilot"
 MANAGED_DIRECTORIES=(instructions agents skills)
 MANAGED_FILES=(copilot-instructions.md)
 PACK_MARKER="<!-- copilot-config-pack: joel-000/copilot-configs -->"
+LEGACY_PACK_INSTRUCTIONS_SHA256="0fafb8a194b7db9a41aa9bbd747a1894b05e1907adfffcc4527aa006ed8857fd"
 
 COPILOT_HOME="${HOME}/.copilot"
 FORCE=false
@@ -126,6 +127,16 @@ has_pack_marker() {
   [[ -f "${marker_file}" ]] && grep -Fq "${PACK_MARKER}" "${marker_file}"
 }
 
+has_legacy_pack_instructions() {
+  local root="$1"
+  local instructions_file="${root}/copilot-instructions.md"
+  local instructions_sha
+
+  [[ -f "${instructions_file}" ]] || return 1
+  instructions_sha="$(sha256sum -- "${instructions_file}" | awk '{print $1}')"
+  [[ "${instructions_sha}" == "${LEGACY_PACK_INSTRUCTIONS_SHA256}" ]]
+}
+
 array_contains() {
   local needle="$1"
   shift
@@ -226,7 +237,9 @@ cleanup_legacy_prompt_link() {
   local -a legacy_source_roots=("${COPILOT_SOURCE}")
 
   for item in "${MANAGED_DIRECTORIES[@]}" "${MANAGED_FILES[@]}"; do
-    if candidate_source_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)" && is_cleanup_candidate_copilot_source_root "${candidate_source_root}" && has_pack_marker "${candidate_source_root}"; then
+    if candidate_source_root="$(copilot_root_from_managed_item_link "${item}" 2>/dev/null)" &&
+      is_cleanup_candidate_copilot_source_root "${candidate_source_root}" &&
+      (has_pack_marker "${candidate_source_root}" || has_legacy_pack_instructions "${candidate_source_root}"); then
       if ! array_contains "${candidate_source_root}" "${legacy_source_roots[@]}"; then
         legacy_source_roots+=("${candidate_source_root}")
       fi

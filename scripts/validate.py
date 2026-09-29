@@ -10,7 +10,7 @@ from typing import Dict, Iterable, List, Optional, Set, Tuple
 
 ROOT = Path(__file__).resolve().parent.parent
 COPILOT_ROOT = ROOT / "copilot"
-REQUIRED_SUBDIRS = ("agents", "instructions", "prompts", "skills")
+REQUIRED_SUBDIRS = ("agents", "instructions", "skills")
 FRONTMATTER_RE = re.compile(r"^---\n(.*?)\n---", re.S)
 KEY_RE = re.compile(r"^(\w[\w-]*):", re.M)
 
@@ -139,24 +139,6 @@ def validate_instructions_dir(instructions_dir: Path, errors: List[str]) -> None
         check_required_keys(path, ("description", "applyTo"), errors)
 
 
-def validate_prompts_dir(
-    prompts_dir: Path, agent_names: Dict[str, Path], errors: List[str]
-) -> None:
-    if not prompts_dir.is_dir():
-        return
-
-    for path in sorted(prompts_dir.glob("*.prompt.md")):
-        result = check_required_keys(path, ("name", "description", "agent"), errors)
-        if not result:
-            continue
-        _, frontmatter = result
-        agent = extract_scalar(frontmatter, "agent")
-        if not agent:
-            errors.append(f"missing parseable agent reference in {path}")
-        elif agent not in agent_names:
-            errors.append(f"unknown prompt agent {agent!r} in {path}")
-
-
 def validate_skills_dir(skills_dir: Path, errors: List[str]) -> None:
     if not skills_dir.is_dir():
         return
@@ -165,25 +147,43 @@ def validate_skills_dir(skills_dir: Path, errors: List[str]) -> None:
         check_required_keys(path, ("name", "description"), errors)
 
 
+def check_for_prompt_artifacts(base_dir: Path, errors: List[str]) -> None:
+    for path in sorted(base_dir.rglob("*.prompt.md")):
+        errors.append(f"legacy prompt artifacts are not allowed: {path}")
+
+
+def validate_pack_tree(
+    pack_root: Path, errors: List[str], require_subdirs: bool, check_prompt_artifacts: bool
+) -> None:
+    if not pack_root.is_dir():
+        if require_subdirs:
+            errors.append(f"missing source directory: {pack_root}")
+        return
+
+    if require_subdirs:
+        for name in REQUIRED_SUBDIRS:
+            subdir = pack_root / name
+            if not subdir.is_dir():
+                errors.append(f"missing expected directory: {subdir}")
+        check_for_symlinks(pack_root, errors)
+        if check_prompt_artifacts:
+            check_for_prompt_artifacts(pack_root, errors)
+
+    agent_names, agent_ids, agent_records = collect_agent_records(pack_root / "agents", errors)
+    validate_agent_handoffs(agent_names, agent_ids, agent_records, errors)
+    validate_instructions_dir(pack_root / "instructions", errors)
+    validate_skills_dir(pack_root / "skills", errors)
+
+
 def main() -> int:
     errors: List[str] = []
 
-    if not COPILOT_ROOT.is_dir():
-        errors.append(f"missing source directory: {COPILOT_ROOT}")
-    else:
-        for name in REQUIRED_SUBDIRS:
-            subdir = COPILOT_ROOT / name
-            if not subdir.is_dir():
-                errors.append(f"missing expected directory: {subdir}")
-        check_for_symlinks(COPILOT_ROOT, errors)
-
-    agent_names, agent_ids, agent_records = collect_agent_records(
-        COPILOT_ROOT / "agents", errors
+    validate_pack_tree(
+        COPILOT_ROOT, errors, require_subdirs=True, check_prompt_artifacts=True
     )
-    validate_agent_handoffs(agent_names, agent_ids, agent_records, errors)
-    validate_instructions_dir(COPILOT_ROOT / "instructions", errors)
-    validate_prompts_dir(COPILOT_ROOT / "prompts", agent_names, errors)
-    validate_skills_dir(COPILOT_ROOT / "skills", errors)
+    validate_pack_tree(
+        ROOT / ".github", errors, require_subdirs=False, check_prompt_artifacts=False
+    )
 
     if errors:
         print("Validation failed:", file=sys.stderr)

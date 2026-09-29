@@ -17,7 +17,7 @@ description: Use when creating or modifying FastAPI routes, request models, resp
   explicit approval before deeper planning or edits, following the
   Implementer policy.
 - For a material change, provide a compact plan and use the review gates in
-  `../../instructions/agent-topology.instructions.md`.
+  `copilot/instructions/agent-topology.instructions.md`.
 - Do not implement a material change until the required review gates pass or
   are explicitly waived.
 

@@ -152,25 +152,38 @@ def check_for_prompt_artifacts(base_dir: Path, errors: List[str]) -> None:
         errors.append(f"legacy prompt artifacts are not allowed: {path}")
 
 
+def validate_pack_tree(
+    pack_root: Path, errors: List[str], require_subdirs: bool, check_prompt_artifacts: bool
+) -> None:
+    if not pack_root.is_dir():
+        if require_subdirs:
+            errors.append(f"missing source directory: {pack_root}")
+        return
+
+    if require_subdirs:
+        for name in REQUIRED_SUBDIRS:
+            subdir = pack_root / name
+            if not subdir.is_dir():
+                errors.append(f"missing expected directory: {subdir}")
+        check_for_symlinks(pack_root, errors)
+        if check_prompt_artifacts:
+            check_for_prompt_artifacts(pack_root, errors)
+
+    agent_names, agent_ids, agent_records = collect_agent_records(pack_root / "agents", errors)
+    validate_agent_handoffs(agent_names, agent_ids, agent_records, errors)
+    validate_instructions_dir(pack_root / "instructions", errors)
+    validate_skills_dir(pack_root / "skills", errors)
+
+
 def main() -> int:
     errors: List[str] = []
 
-    if not COPILOT_ROOT.is_dir():
-        errors.append(f"missing source directory: {COPILOT_ROOT}")
-    else:
-        for name in REQUIRED_SUBDIRS:
-            subdir = COPILOT_ROOT / name
-            if not subdir.is_dir():
-                errors.append(f"missing expected directory: {subdir}")
-        check_for_symlinks(COPILOT_ROOT, errors)
-        check_for_prompt_artifacts(COPILOT_ROOT, errors)
-
-    agent_names, agent_ids, agent_records = collect_agent_records(
-        COPILOT_ROOT / "agents", errors
+    validate_pack_tree(
+        COPILOT_ROOT, errors, require_subdirs=True, check_prompt_artifacts=True
     )
-    validate_agent_handoffs(agent_names, agent_ids, agent_records, errors)
-    validate_instructions_dir(COPILOT_ROOT / "instructions", errors)
-    validate_skills_dir(COPILOT_ROOT / "skills", errors)
+    validate_pack_tree(
+        ROOT / ".github", errors, require_subdirs=False, check_prompt_artifacts=False
+    )
 
     if errors:
         print("Validation failed:", file=sys.stderr)

@@ -573,6 +573,36 @@ Every prompt file should include YAML frontmatter with the following fields:
 
           rm -f "$fixture_file"
 
+      - name: Ensure validator fails on broken root handoff agent references
+        run: |
+          set -euo pipefail
+          fixture_file=".github/agents/zz-regression-bad-root-handoff.agent.md"
+          mkdir -p "$(dirname "$fixture_file")"
+          cat > "$fixture_file" <<'EOF'
+          ---
+          name: 'Regression Root Handoff Fixture'
+          description: 'Intentionally invalid root handoff target for validator regression checks'
+          tools: ['read']
+          handoffs:
+            - label: Broken root handoff
+              agent: nonexistent-agent
+              prompt: 'This should fail validation.'
+              send: false
+          ---
+
+          This file intentionally contains an invalid root handoff reference.
+          EOF
+
+          cleanup() {
+            rm -f "$fixture_file"
+          }
+          trap cleanup EXIT
+
+          if python scripts/validate.py; then
+            echo "Expected validator failure for root .github handoff, but it passed."
+            exit 1
+          fi
+
       - name: Ensure validator does not require root/source file mirroring
         run: |
           set -euo pipefail

@@ -145,6 +145,7 @@ is_pack_owned_legacy_repo_artifact() {
 cleanup_legacy_repo_artifacts() {
   local relative_path
   local artifact_path
+  local cleanup_performed=false
 
   for relative_path in "${LEGACY_REPO_ARTIFACTS[@]}"; do
     artifact_path="${TARGET_GITHUB_CANONICAL}/${relative_path}"
@@ -155,12 +156,18 @@ cleanup_legacy_repo_artifacts() {
       echo "Skipped legacy artifact cleanup for symlinked path: ${artifact_path}" >&2
       continue
     fi
+    if [[ ! -f "${artifact_path}" ]]; then
+      continue
+    fi
     if is_pack_owned_legacy_repo_artifact "${relative_path}" "${artifact_path}"; then
-      rm -f -- "${artifact_path}"
+      if rm -f -- "${artifact_path}"; then
+        cleanup_performed=true
+      fi
     fi
   done
 
-  if ! path_has_symlink_component "${TARGET_GITHUB_CANONICAL}/prompts"; then
+  if [[ "${cleanup_performed}" == true ]] &&
+    ! path_has_symlink_component "${TARGET_GITHUB_CANONICAL}/prompts"; then
     rmdir --ignore-fail-on-non-empty -- "${TARGET_GITHUB_CANONICAL}/prompts" 2>/dev/null || true
   fi
 }

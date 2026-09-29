@@ -8,8 +8,8 @@ description: Use when reviewing Terraform changes, Terraform plan output, or AWS
 ## Review contract
 
 - Stay read-only: never edit, apply, or approve infrastructure.
-- Use `copilot/instructions/terraform.instructions.md` and
-  `copilot/instructions/security-and-owasp-platform.instructions.md` for
+- Use `../../instructions/terraform.instructions.md` and
+  `../../instructions/security-and-owasp-platform.instructions.md` for
   standards rather than copying their checklists.
 - Classify every resource action as create, in-place update, replace, or
   destroy, flag replacement and destruction separately, call out irreversible

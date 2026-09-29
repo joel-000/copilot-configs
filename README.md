@@ -105,8 +105,8 @@ The validator currently checks:
 - Prefer additive installs by default; only use `--prune` when you intend to remove unmanaged target files.
 - When adding or changing an agent handoff, validate that its `agent` value matches an agent `name` or agent filename without `.agent.md`.
 - When adding a new configuration artifact, include complete frontmatter so the validator can enforce consistency.
-- Repository installs are safe-merge by default. During upgrade they remove the
-  five known legacy `.github/prompts/*.prompt.md` files plus
+- Repository installs are safe-merge by default. During upgrade they remove
+  pack-owned copies of the five legacy `.github/prompts/*.prompt.md` files plus
   `.github/instructions/prompt.instructions.md`, while preserving unrelated
   target files. Use `--prune --confirm-prune` only when you intend exact
   mirroring of the destination.

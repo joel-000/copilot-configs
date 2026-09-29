@@ -62,8 +62,8 @@
   bash scripts/global_install.sh --help
   ```
 
-- Repository installation is safe-merge by default. It removes the five known
-  legacy `.github/prompts/*.prompt.md` files plus
+- Repository installation is safe-merge by default. It removes pack-owned
+  copies of the five known legacy `.github/prompts/*.prompt.md` files plus
   `.github/instructions/prompt.instructions.md` during upgrade, while
   preserving unrelated target files. Use the repository's confirmed `--prune`
   flow only when exact mirroring is intended.

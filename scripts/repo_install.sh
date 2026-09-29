@@ -99,6 +99,41 @@ path_has_symlink_component() {
   return 1
 }
 
+legacy_repo_artifact_object_id() {
+  case "$1" in
+    prompts/add-fastapi-endpoint.prompt.md)
+      printf '%s\n' '1f7fe408cf3e844123be9e75d7321cee8140d365'
+      ;;
+    prompts/improve-docker-setup.prompt.md)
+      printf '%s\n' 'a5e20180c007954a3e2525425172eb46aab7f609'
+      ;;
+    prompts/plan-approved-slice.prompt.md)
+      printf '%s\n' '189d65fa7df693aa21218c12c555a70f9fbe9ecd'
+      ;;
+    prompts/prepare-pr.prompt.md)
+      printf '%s\n' '0bd41553923195b36b2be6fd6640607a741c81c5'
+      ;;
+    prompts/review-terraform-plan.prompt.md)
+      printf '%s\n' '0bd69407aa0a04bdd38de68445b9c9ef1fd4f2d9'
+      ;;
+    instructions/prompt.instructions.md)
+      printf '%s\n' 'ec147a2095b8fc2848ce9676acde3031532d7b98'
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+is_pack_owned_legacy_repo_artifact() {
+  local relative_path="$1"
+  local artifact_path="$2"
+  local expected_object_id
+
+  expected_object_id="$(legacy_repo_artifact_object_id "${relative_path}")" || return 1
+  [[ "$(git hash-object -- "${artifact_path}")" == "${expected_object_id}" ]]
+}
+
 cleanup_legacy_repo_artifacts() {
   local relative_path
   local artifact_path
@@ -112,7 +147,9 @@ cleanup_legacy_repo_artifacts() {
       echo "Skipped legacy artifact cleanup for symlinked path: ${artifact_path}" >&2
       continue
     fi
-    rm -f -- "${artifact_path}"
+    if is_pack_owned_legacy_repo_artifact "${relative_path}" "${artifact_path}"; then
+      rm -f -- "${artifact_path}"
+    fi
   done
 
   if ! path_has_symlink_component "${TARGET_GITHUB_CANONICAL}/prompts"; then

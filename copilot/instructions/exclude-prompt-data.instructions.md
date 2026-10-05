@@ -52,10 +52,13 @@ The output file should contain only:
 
 ## Output Quality
 
-Match the intended audience: write `README.md` for human developers and
-`AGENTS.md` for coding agents, unless the user specifies otherwise. When both
-audiences need a plan, keep the concise, plain-English human summary separate
-from the detailed agent execution steps.
+Choose the audience from the request and surrounding context. Follow any
+filename or format the user explicitly requests. If none is specified, default
+to `README.md` for human developers and `AGENTS.md` for coding agents. For a
+response that is not a file, apply the same audience distinction in the
+response. When both audiences need a plan, keep the concise, plain-English
+human summary separate from the detailed agent execution steps. If the intended
+audience or output is unclear, ask the user to clarify.
 
 The prompt's writing quality does not set the bar for the output. Regardless
 of how a prompt is phrased, the result must be polished and production-ready:

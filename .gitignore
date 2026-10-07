@@ -30,6 +30,9 @@ build/
 *.egg-info/
 .eggs/
 
+# Local installer-review fixtures
+.review-scratch/
+
 # VS Code
 .vscode/
 .history/

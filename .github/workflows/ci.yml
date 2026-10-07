@@ -37,7 +37,6 @@ jobs:
           bash scripts/repo_install.sh "$target"
           test -d "$target/.github/agents"
           test -d "$target/.github/instructions"
-          test -d "$target/.github/prompts"
           test -d "$target/.github/skills"
 
       - name: Verify installer idempotency
@@ -49,6 +48,297 @@ jobs:
           bash scripts/repo_install.sh "$target"
           second_checksum="$(tar --sort=name --mtime='UTC 1970-01-01' --owner=0 --group=0 --numeric-owner -cf - -C "$target/.github" . | sha256sum | cut -d' ' -f1)"
           test "$first_checksum" = "$second_checksum"
+
+      - name: Verify safe-merge install removes known legacy prompt artifacts only
+        run: |
+          set -euo pipefail
+          target="$(mktemp -d)"
+          TARGET="$target" python - <<'PY'
+          import os
+          from pathlib import Path
+
+          target = Path(os.environ["TARGET"]) / ".github"
+          files = {
+              "prompts/add-fastapi-endpoint.prompt.md": """---
+name: add-fastapi-endpoint
+description: Add a FastAPI endpoint following repository conventions.
+agent: Implementer
+---
+
+Plan and deliver a FastAPI endpoint change using the full workflow.
+
+Steps:
+1. Start with the approval checkpoint (goal, uncertainty, smallest slice, explicit approval request).
+2. After approval, generate a scoped execution plan for the endpoint change with TDD as default.
+3. Run `quality-review(plan)` and `security-review(plan)`; do not start implementation until both pass or are explicitly waived under `agent-topology.instructions.md`.
+4. After plan gates pass, implement the approved slice with TDD (`failing test -> implementation -> pass/refactor`).
+5. Continue normal post-change gates and scoped documentation updates.
+""",
+              "prompts/improve-docker-setup.prompt.md": """---
+name: improve-docker-setup
+description: Improve Dockerfiles and Compose config for security, image size, and modern build practices.
+agent: Implementer
+---
+
+Plan and deliver container setup improvements using the full workflow.
+
+Focus during planning and implementation:
+1. Dockerfile best practices and modern BuildKit features where useful.
+2. Multi-stage builds to reduce runtime image size.
+3. Secure-by-default configuration (non-root runtime, minimal base image, least exposure).
+4. Docker secrets over plain environment variables for sensitive values.
+5. Docker Compose usage when multiple services or local dependencies are involved.
+
+Workflow requirements:
+1. Start with approval checkpoint and explicit slice sign-off.
+2. Generate a scoped execution plan with TDD-style validation defaults where supported.
+3. Run `quality-review(plan)` and `security-review(plan)` before implementation; require both to pass or be explicitly waived under `agent-topology.instructions.md`.
+4. After plan gates pass, implement the approved slice with minimal, secure changes.
+""",
+              "prompts/plan-approved-slice.prompt.md": """---
+name: plan-approved-slice
+description: 'Start with a concise approval checkpoint before deeper planning or coding.'
+agent: Implementer
+---
+
+# Plan Approved Slice
+
+## Mission
+
+Start with the human-summary-first planning workflow.
+
+## Workflow
+
+1. Restate the goal in plain English.
+2. Surface the biggest uncertainty or assumption.
+3. Propose the smallest useful next slice.
+4. Ask for approval or correction before deeper planning or coding.
+5. Treat planning requests as non-approval until the user explicitly approves the slice.
+6. After approval, build a compact in-session context packet for execution.
+7. Keep downstream outputs compact: pass the slice, delta, and blockers instead of replaying full prior prose.
+
+## Scope & Preconditions
+
+- Stop after the concise checkpoint unless the user explicitly asks for more detail.
+- Do not produce a full implementation plan before approval.
+- Do not start coding before approval.
+
+## Plan Readiness Gate
+
+- Before a detailed execution plan is treated as ready for implementation, require both Quality Review and Security Review outcomes on that plan.
+- Build and reuse a compact context snapshot before detailed execution planning so the same session does not repeatedly re-scan the repository.
+- If either review is blocked, return blockers and required corrections instead of reporting the plan as ready.
+- Follow the waiver policy in `agent-topology.instructions.md`. Do not request waiver details already established in the current conversation.
+- Keep plans execution-first: prioritize concrete code-change steps and testing, with TDD as the default implementation model.
+- Prefer terse stage outputs unless the work is blocked or high risk.
+
+## Output Expectations
+
+- Keep the first response brief and easy to scan.
+- Make the approval boundary explicit.
+- Stay inside the approved slice after the user confirms it.
+""",
+              "prompts/prepare-pr.prompt.md": """---
+name: prepare-pr
+description: Prepare a PR summary and final review.
+agent: Implementer
+---
+
+Review the current change and prepare:
+
+- PR title
+- PR summary
+- Test evidence
+- Risk notes
+- Reviewer checklist
+- Anything that should be fixed before opening the PR
+
+Before final readiness, verify:
+
+- Initial Quality Review gate (`quality-review(changes)`) is pass or explicitly waived
+- Initial Security Review gate (`security-review(changes)`) is pass or explicitly waived
+- Documentation completion is complete or explicitly waived
+- The latest Quality Review and Security Review verdicts are reused when no subsequent change materially affects the reviewed surface
+- Re-review is requested only when subsequent changes materially affect behaviour, tests, configuration, dependencies, permissions, exposure or security posture
+
+If any required precondition is missing, do not mark the PR as ready.
+
+Follow the waiver policy in `agent-topology.instructions.md`. Do not request waiver details already established in the current conversation.
+
+If a waiver is used, include:
+
+### Waiver
+
+`Waived by explicit user instruction`, followed by the waived gate or affected finding, accepted risk and scope summarised from the current conversation.
+""",
+              "prompts/review-terraform-plan.prompt.md": """---
+name: review-terraform-plan
+description: Review Terraform changes or plan output for AWS risk.
+agent: Implementer
+---
+
+# Review Terraform Plan
+
+## Scope
+
+Review the supplied Terraform diff or plan output. Do not modify infrastructure files.
+
+## Workflow
+
+1. Identify resources added, changed, replaced, and destroyed.
+2. Prioritize destructive actions and irreversible data changes.
+3. Check IAM permissions and public exposure for least-privilege and secure defaults.
+4. Check state addresses, module changes, and replacement triggers.
+5. Confirm whether formatting, validation, and plan commands were run.
+
+## Output
+
+Return:
+- Destructive changes
+- Resource replacements
+- IAM risk
+- Public exposure risk
+- State/resource address risk
+- Missing fmt/validate/plan steps
+- Final go/no-go judgement
+
+For each finding, include the affected resource, evidence from the diff or plan, severity, and the smallest safe follow-up.
+
+## Validation
+
+If command execution is available, run the narrowest relevant checks:
+
+```bash
+terraform fmt -check
+terraform validate
+terraform plan
+```
+
+Report commands that could not run and why. Do not treat an unavailable command as a passing check.
+""",
+              "instructions/prompt.instructions.md": """---
+description: 'Guidelines for creating high-quality prompt files for GitHub Copilot'
+applyTo: '**/*.prompt.md'
+---
+
+# Copilot Prompt Files Guidelines
+
+Instructions for creating effective and maintainable prompt files that guide GitHub Copilot in delivering consistent, high-quality outcomes across any repository.
+
+## Scope and Principles
+- Target audience: maintainers and contributors authoring reusable prompts for Copilot Chat.
+- Goals: predictable behaviour, clear expectations, minimal permissions, and portability across repositories.
+- Primary references: the shared Copilot prompt-file format and organization-specific conventions.
+
+## Frontmatter Requirements
+
+Every prompt file should include YAML frontmatter with the following fields:
+
+### Required/Recommended Fields
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `description` | Recommended | A short description of the prompt (single sentence, actionable outcome) |
+| `name` | Optional | The name shown after typing `/` in chat. Defaults to filename if not specified |
+| `agent` | Required in this pack | The custom agent to use. This pack routes prompts through `Implementer`, `Quality Review Test Agent`, or `Security Review Agent`; the validator enforces those names. |
+| `model` | Optional | The language model to use. Defaults to the currently selected model |
+| `tools` | Optional | List of tool/tool set names available for this prompt |
+| `argument-hint` | Optional | Hint text shown in chat input to guide user interaction |
+
+### Guidelines
+
+- Use consistent quoting (single quotes recommended) and keep one field per line for readability and version control clarity
+- If `tools` are specified and the current agent is `ask` or `edit`, the default agent becomes `agent`
+- Preserve any additional metadata (`language`, `tags`, `visibility`, etc.) required by your organization
+
+## File Naming and Placement
+- Use kebab-case filenames ending with `.prompt.md` and store them under `.github/prompts/` unless your workspace standard specifies another directory. Keep prompt bodies and frontmatter within the shared format supported by both VS Code and PyCharm; do not depend on IDE-specific UI actions or metadata.
+- Provide a short filename that communicates the action (for example, `generate-readme.prompt.md` rather than `prompt1.prompt.md`).
+
+## Body Structure
+- Start with an `#` level heading that matches the prompt intent so it surfaces well in Quick Pick search.
+- Organize content with predictable sections. Recommended baseline: `Mission` or `Primary Directive`, `Scope & Preconditions`, `Inputs`, `Workflow` (step-by-step), `Output Expectations`, and `Quality Assurance`.
+- Adjust section names to fit the domain, but retain the logical flow: why → context → inputs → actions → outputs → validation.
+- Reference related prompts or instruction files using relative links to aid discoverability.
+
+## Input and Context Handling
+- Use `${input:variableName[:placeholder]}` for required values and explain when the user must supply them. Provide defaults or alternatives where possible.
+- Call out contextual variables such as `${selection}`, `${file}`, `${workspaceFolder}` only when they are essential, and describe how Copilot should interpret them.
+- Document how to proceed when mandatory context is missing (for example, “Request the file path and stop if it remains undefined”).
+
+## Tool and Permission Guidance
+- Limit `tools` to the smallest set that enables the task. List them in the preferred execution order when the sequence matters.
+- If the prompt inherits tools from a chat mode, mention that relationship and state any critical tool behaviours or side effects.
+- Warn about destructive operations (file creation, edits, terminal commands) and include guard rails or confirmation steps in the workflow.
+
+## Routing Guidance For This Pack
+
+- Prefer `agent: 'Implementer'` as the default routing choice for this configuration pack.
+- Use `Quality Review Test Agent` and `Security Review Agent` only for explicit gate/review prompts.
+- Although upstream Copilot supports built-in agent values such as `ask`, `edit`, and `agent`, do not use them in this pack because they bypass the configured review topology and fail pack validation.
+- Do not route prompts to specialist orchestration agents unless the repository policy explicitly re-introduces them.
+
+## Instruction Tone and Style
+- Write in direct, imperative sentences targeted at Copilot (for example, “Analyze”, “Generate”, “Summarize”).
+- Keep sentences short and unambiguous, following Google Developer Documentation translation best practices to support localization.
+- Avoid idioms, humor, or culturally specific references; favor neutral, inclusive language.
+
+## Output Definition
+- Specify the format, structure, and location of expected results (for example, “Create `docs/adr/adr-XXXX.md` using the template below”).
+- Include success criteria and failure triggers so Copilot knows when to halt or retry.
+- Provide validation steps—manual checks, automated commands, or acceptance criteria lists—that reviewers can execute after running the prompt.
+
+## Examples and Reusable Assets
+- Embed Good/Bad examples or scaffolds (Markdown templates, JSON stubs) that the prompt should produce or follow.
+- Maintain reference tables (capabilities, status codes, role descriptions) inline to keep the prompt self-contained. Update these tables when upstream resources change.
+- Link to authoritative documentation instead of duplicating lengthy guidance.
+
+## Quality Assurance Checklist
+- [ ] Frontmatter fields are complete, accurate, and least-privilege.
+- [ ] Inputs include placeholders, default behaviours, and fallbacks.
+- [ ] Workflow covers preparation, execution, and post-processing without gaps.
+- [ ] Output expectations include formatting and storage details.
+- [ ] Validation steps are actionable (commands, diff checks, review prompts).
+- [ ] Security, compliance, and privacy policies referenced by the prompt are current.
+- [ ] Prompt executes successfully in both VS Code and PyCharm using representative scenarios.
+
+## Maintenance Guidance
+- Version-control prompts alongside the code they affect; update them when dependencies, tooling, or review processes change.
+- Review prompts periodically to ensure tool lists, model requirements, and linked documents remain valid.
+- Coordinate with other repositories: when a prompt proves broadly useful, extract common guidance into instruction files or shared prompt packs.
+
+## Additional Resources
+- [Prompt Files Documentation](https://code.visualstudio.com/docs/agent-customization/prompt-files)
+- [Awesome Copilot Prompt Files](https://github.com/github/awesome-copilot/tree/main/prompts)
+- [Tool Configuration](https://code.visualstudio.com/docs/agent-customization/custom-agents)
+""",
+          }
+
+          for relative_path, content in files.items():
+              path = target / relative_path
+              path.parent.mkdir(parents=True, exist_ok=True)
+              path.write_text(content)
+          PY
+          printf "keep\n" > "$target/.github/prompts/custom-user-file.txt"
+          bash scripts/repo_install.sh "$target"
+          test ! -e "$target/.github/prompts/add-fastapi-endpoint.prompt.md"
+          test ! -e "$target/.github/prompts/improve-docker-setup.prompt.md"
+          test ! -e "$target/.github/prompts/plan-approved-slice.prompt.md"
+          test ! -e "$target/.github/prompts/prepare-pr.prompt.md"
+          test ! -e "$target/.github/prompts/review-terraform-plan.prompt.md"
+          test ! -e "$target/.github/instructions/prompt.instructions.md"
+          test -f "$target/.github/prompts/custom-user-file.txt"
+
+      - name: Verify safe-merge install preserves unrelated same-name prompt artifacts
+        run: |
+          set -euo pipefail
+          target="$(mktemp -d)"
+          mkdir -p "$target/.github/prompts" "$target/.github/instructions"
+          printf "user prompt\n" > "$target/.github/prompts/prepare-pr.prompt.md"
+          printf "user prompt instructions\n" > "$target/.github/instructions/prompt.instructions.md"
+          bash scripts/repo_install.sh "$target"
+          test -f "$target/.github/prompts/prepare-pr.prompt.md"
+          test -f "$target/.github/instructions/prompt.instructions.md"
 
       - name: Verify prune mode removes unmanaged files
         run: |
@@ -81,11 +371,9 @@ jobs:
           bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
           test -L "$copilot_home/instructions"
           test -L "$copilot_home/agents"
-          test -L "$copilot_home/prompts"
           test -L "$copilot_home/skills"
           test "$(readlink "$copilot_home/instructions")" = "$repo_root/copilot/instructions"
           test "$(readlink "$copilot_home/agents")" = "$repo_root/copilot/agents"
-          test "$(readlink "$copilot_home/prompts")" = "$repo_root/copilot/prompts"
           test "$(readlink "$copilot_home/skills")" = "$repo_root/copilot/skills"
           test "$(readlink "$copilot_home/copilot-instructions.md")" = "$repo_root/copilot/copilot-instructions.md"
 
@@ -99,13 +387,132 @@ jobs:
           second_snapshot="$(find "$copilot_home" -mindepth 1 -maxdepth 1 -printf '%f:%l\n' | sort)"
           test "$first_snapshot" = "$second_snapshot"
 
+      - name: Verify global installer removes owned legacy prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          repo_root="$(realpath -m "$(pwd)")"
+          legacy_target="${repo_root}/copilot/prompts"
+          ln -s "${legacy_target}" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
+          test ! -L "$copilot_home/prompts"
+
+      - name: Verify global installer removes prior-install legacy prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          old_root_base="$(mktemp -d)"
+          old_root="${old_root_base}/copilot"
+          mkdir -p "${old_root}/agents" "${old_root}/instructions" "${old_root}/skills" "${old_root}/prompts"
+          cat > "${old_root}/copilot-instructions.md" <<'EOF'
+          # Repository Instructions
+
+          ## Maintainability
+
+          This repository is maintained by multiple developers. Code must be understandable without access to the task conversation that produced it.
+
+          Prioritise, in order:
+
+          1. Correctness against the acceptance criteria.
+          2. Readability for a developer unfamiliar with the change.
+          3. Consistency with nearby code and repository conventions.
+          4. Maintainability and ease of future modification.
+          5. The smallest proportionate change.
+
+          Complexity is a maintenance cost and requires demonstrated justification.
+
+          Prefer direct, explicit implementations over abstractions, indirection or configuration for hypothetical future requirements.
+
+          Introduce a helper or abstraction only when it removes clear repetition or follows an established repository pattern.
+
+          Do not perform unrelated refactoring, cleanup or speculative hardening.
+
+          ## Review Findings
+
+          A review finding warrants changes only when it identifies a reachable, material risk within the current scope that existing controls do not address.
+
+          Resolve accepted findings with the smallest repository-consistent change that achieves the required outcome.
+
+          Challenge findings that are speculative, depend on unsupported assumptions, duplicate existing controls or require disproportionate complexity.
+
+          Defer valid findings that fall outside the approved scope and do not block safe completion.
+
+          Reviewers define the problem or required outcome. The Implementer owns finding disposition and chooses the simplest maintainable remediation.
+
+          ## Tests
+
+          Test observable behaviour rather than implementation details, unreachable states or hypothetical requirements.
+
+          Follow existing repository conventions. Prefer a small number of readable tests over exhaustive or duplicative coverage.
+
+          When modifying tests, use shared fixtures, builders, helpers or parametrisation only when they clearly reduce repetition without obscuring behaviour.
+
+          ## Comments and Documentation
+
+          Write comments only for non-obvious constraints, decisions or behaviour. Do not narrate straightforward code or preserve task-conversation context.
+
+          Update documentation only when the change affects documented behaviour, interfaces, configuration or operating procedures.
+
+          ## Validation
+
+          Agents that modify repository files must run focused tests first, followed by the relevant broader tests and static checks.
+
+          Before final readiness, the Implementer must remove unrelated changes and simplify unnecessary helpers, abstractions and control flow.
+          EOF
+          ln -s "${old_root}/agents" "$copilot_home/agents"
+          ln -s "${old_root}/instructions" "$copilot_home/instructions"
+          ln -s "${old_root}/skills" "$copilot_home/skills"
+          ln -s "${old_root}/copilot-instructions.md" "$copilot_home/copilot-instructions.md"
+          ln -s "${old_root}/prompts" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          test ! -L "$copilot_home/prompts"
+
+      - name: Verify global installer removes canonicalized legacy prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          repo_root="$(realpath -m "$(pwd)")"
+          legacy_target="${repo_root}/copilot/prompts"
+          ln -s "${legacy_target}/../prompts" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"
+          test ! -L "$copilot_home/prompts"
+
+      - name: Verify global installer preserves unrelated prompt link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          unrelated_root="$(mktemp -d)/copilot"
+          unrelated_prompts_target="$(mktemp -d)/custom-prompts"
+          mkdir -p "${unrelated_root}/agents" "${unrelated_root}/instructions" "${unrelated_root}/skills" "${unrelated_prompts_target}"
+          printf "legacy\n" > "${unrelated_root}/copilot-instructions.md"
+          ln -s "${unrelated_root}/agents" "$copilot_home/agents"
+          ln -s "${unrelated_prompts_target}" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          test -L "$copilot_home/prompts"
+          test "$(readlink "$copilot_home/prompts")" = "${unrelated_prompts_target}"
+
+      - name: Verify global installer preserves unrelated prompt-era pack link
+        run: |
+          set -euo pipefail
+          copilot_home="$(mktemp -d)"
+          unrelated_root="$(mktemp -d)/copilot"
+          mkdir -p "${unrelated_root}/agents" "${unrelated_root}/instructions" "${unrelated_root}/prompts"
+          printf "legacy\n" > "${unrelated_root}/copilot-instructions.md"
+          ln -s "${unrelated_root}/agents" "$copilot_home/agents"
+          ln -s "${unrelated_root}/instructions" "$copilot_home/instructions"
+          ln -s "${unrelated_root}/copilot-instructions.md" "$copilot_home/copilot-instructions.md"
+          ln -s "${unrelated_root}/prompts" "$copilot_home/prompts"
+          bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
+          test -L "$copilot_home/prompts"
+          test "$(readlink "$copilot_home/prompts")" = "${unrelated_root}/prompts"
+
       - name: Verify global installer force-replaces conflicts
         run: |
           set -euo pipefail
           copilot_home="$(mktemp -d)"
           repo_root="$(pwd)"
-          mkdir -p "$copilot_home/prompts"
-          printf "stale prompt config\n" > "$copilot_home/prompts/old.txt"
+          mkdir -p "$copilot_home/skills"
+          printf "stale skill config\n" > "$copilot_home/skills/old.txt"
           ln -s /tmp/stale-agent-config "$copilot_home/agents"
           if bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home"; then
             echo "Expected installer to fail when managed paths conflict without --force."
@@ -113,9 +520,9 @@ jobs:
           fi
           bash scripts/global_install.sh --allow-outside-home --copilot-home "$copilot_home" --force
           test -L "$copilot_home/agents"
-          test -L "$copilot_home/prompts"
+          test -L "$copilot_home/skills"
           test "$(readlink "$copilot_home/agents")" = "$repo_root/copilot/agents"
-          test "$(readlink "$copilot_home/prompts")" = "$repo_root/copilot/prompts"
+          test "$(readlink "$copilot_home/skills")" = "$repo_root/copilot/skills"
 
   validator-regression:
     runs-on: ubuntu-latest
@@ -123,27 +530,21 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
 
-      - name: Ensure validator fails on broken prompt agent references
+      - name: Ensure repository contains no legacy prompt artifacts
         run: |
           set -euo pipefail
-          fixture_file="copilot/prompts/zz-regression-bad-agent.prompt.md"
-          cat > "$fixture_file" <<'EOF'
-          ---
-          name: 'Regression fixture'
-          description: 'Intentionally invalid prompt for validator regression checks'
-          agent: 'Nonexistent Agent Name'
-          ---
-
-          This file intentionally contains an invalid agent reference.
-          EOF
-
-          if python scripts/validate.py; then
-            echo "Expected validator failure, but it passed."
-            rm -f "$fixture_file"
+          if [[ -e copilot/prompts ]]; then
+            echo "Legacy copilot/prompts tree must not exist."
             exit 1
           fi
-
-          rm -f "$fixture_file"
+          if find copilot -type f -name '*.prompt.md' -print | grep -q .; then
+            echo "Legacy prompt artifacts must not exist under copilot/."
+            exit 1
+          fi
+          if grep -RInE 'applyTo:.*(prompts/|\.prompt\.md)' copilot; then
+            echo "Prompt-targeting applyTo globs must not exist under copilot/."
+            exit 1
+          fi
 
       - name: Ensure validator fails on broken handoff agent references
         run: |
@@ -171,6 +572,36 @@ jobs:
           fi
 
           rm -f "$fixture_file"
+
+      - name: Ensure validator fails on broken root handoff agent references
+        run: |
+          set -euo pipefail
+          fixture_file=".github/agents/zz-regression-bad-root-handoff.agent.md"
+          mkdir -p "$(dirname "$fixture_file")"
+          cat > "$fixture_file" <<'EOF'
+          ---
+          name: 'Regression Root Handoff Fixture'
+          description: 'Intentionally invalid root handoff target for validator regression checks'
+          tools: ['read']
+          handoffs:
+            - label: Broken root handoff
+              agent: nonexistent-agent
+              prompt: 'This should fail validation.'
+              send: false
+          ---
+
+          This file intentionally contains an invalid root handoff reference.
+          EOF
+
+          cleanup() {
+            rm -f "$fixture_file"
+          }
+          trap cleanup EXIT
+
+          if python scripts/validate.py; then
+            echo "Expected validator failure for root .github handoff, but it passed."
+            exit 1
+          fi
 
       - name: Ensure validator does not require root/source file mirroring
         run: |

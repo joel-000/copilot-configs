@@ -50,6 +50,10 @@ BREAKING CHANGE: `extends` key behavior changed
 
 ## Workflow
 
+PR readiness assessment and PR operations are out of scope; use the
+`pr-readiness` skill for reviewer-facing evidence. This skill owns only
+staging and commit creation.
+
 ### 1. Analyze Diff
 
 ```bash

@@ -1,4 +1,13 @@
+<!-- copilot-config-pack: joel-000/copilot-configs -->
+
 # Repository Instructions
+
+## Universal approval boundary
+
+Before deeper planning or implementation, identify the goal, largest
+uncertainty, and smallest useful slice, then obtain explicit user approval.
+No skill-selection result may bypass this no-edit boundary. Detailed gate,
+re-review, and waiver mechanics belong to `agent-topology.instructions.md`.
 
 ## Maintainability
 

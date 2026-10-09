@@ -85,6 +85,8 @@ git add -p
 
 **Never commit secrets** (.env, credentials.json, private keys).
 
+Do not add a `Co-authored-by` trailer unless the user explicitly requests it.
+
 ### 3. Generate Commit Message
 
 Analyze the diff to determine:

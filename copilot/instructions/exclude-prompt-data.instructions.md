@@ -60,6 +60,9 @@ response. When both audiences need a plan, keep the concise, plain-English
 human summary separate from the detailed agent execution steps. If the intended
 audience or output is unclear, ask the user to clarify.
 
+Match the level of detail to the audience and purpose; prefer concise,
+scannable content while preserving the information needed to act or review.
+
 The prompt's writing quality does not set the bar for the output. Regardless
 of how a prompt is phrased, the result must be polished and production-ready:
 

@@ -55,6 +55,20 @@ Write comments only for non-obvious constraints, decisions or behaviour. Do not 
 
 Update documentation only when the change affects documented behaviour, interfaces, configuration or operating procedures.
 
+## Test Realism
+
+Local emulators and mocks must not add behaviour the real service lacks, such as name translation, injected defaults or compatibility shims. Pass configuration through unchanged so tests expose real defects.
+
+When fixing a bug, write the failing tests first and confirm they fail for the intended reason before changing production code.
+
+## Debugging Deployed Failures
+
+For repeated CI or deployed-environment failures, gather evidence first (actual URLs, outputs, logs; a temporary diagnostic job is acceptable), state the cause, then propose the fix. Do not guess-fix.
+
+## Scope
+
+Plan, options or analysis requests involve no code changes. List out-of-scope findings as follow-ups instead of fixing them. Do not reference scratch notes or planning documents in code, merge request descriptions or tickets.
+
 ## Validation
 
 Agents that modify repository files must run focused tests first, followed by the relevant broader tests and static checks.

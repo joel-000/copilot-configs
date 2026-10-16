@@ -2,6 +2,14 @@
 
 # Repository Instructions
 
+## Commit attribution
+
+The user's standing preference is to omit AI attribution from every commit.
+Do not add `Co-authored-by: Copilot App`, other AI co-author trailers, or
+AI-generated signatures to commit messages in any workflow, unless the user
+explicitly requests attribution for that commit. Do not change Git author
+identity or cryptographic signing settings.
+
 ## Universal approval boundary
 
 Before deeper planning or implementation, identify the goal, largest

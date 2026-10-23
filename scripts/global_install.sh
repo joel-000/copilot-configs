@@ -25,7 +25,32 @@ EOF
 }
 
 canonicalize_path() {
-  realpath -m -- "$1"
+  if realpath -m -- / >/dev/null 2>&1; then
+    realpath -m -- "$1"
+    return
+  fi
+
+  # Portable fallback (macOS): resolve the deepest existing ancestor, then normalize the rest.
+  local path="$1" existing rest resolved part
+  [[ "${path}" == /* ]] || path="${PWD}/${path}"
+  existing="${path}"
+  rest=""
+  while [[ ! -e "${existing}" && "${existing}" != "/" ]]; do
+    rest="/${existing##*/}${rest}"
+    existing="${existing%/*}"
+    [[ -n "${existing}" ]] || existing="/"
+  done
+  resolved="$(cd -P -- "${existing}" 2>/dev/null && pwd -P)" || resolved="${existing}"
+  local -a parts=()
+  local IFS=/
+  for part in ${resolved}${rest}; do
+    case "${part}" in
+      ""|.) ;;
+      ..) [[ ${#parts[@]} -gt 0 ]] && unset 'parts[${#parts[@]}-1]' ;;
+      *) parts+=("${part}") ;;
+    esac
+  done
+  printf '/%s\n' "${parts[*]}"
 }
 
 canonicalize_link_target() {

@@ -1,6 +1,6 @@
 ---
 description: "Guidance for local AWS testing with Moto or MiniStack across Python, Terraform, and supporting scripts"
-applyTo: "**/*.{py,tf,yml,yaml,sh,md}"
+applyTo: "**/{tests,test}/**/*.py,**/test_*.py,**/*_test.py,**/conftest.py,**/*aws*.py,**/*.tf,**/*compose*.{yml,yaml},**/*local*.sh"
 ---
 
 # AWS local testing path-specific instructions

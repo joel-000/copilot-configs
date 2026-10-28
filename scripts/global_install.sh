@@ -30,30 +30,8 @@ canonicalize_path() {
     return
   fi
 
-  # Portable fallback (macOS): resolve the deepest existing ancestor, then normalize the rest.
-  local path="$1" existing rest resolved part
-  [[ "${path}" == /* ]] || path="${PWD}/${path}"
-  existing="${path}"
-  rest=""
-  while [[ ! -e "${existing}" && "${existing}" != "/" ]]; do
-    rest="/${existing##*/}${rest}"
-    existing="${existing%/*}"
-    [[ -n "${existing}" ]] || existing="/"
-  done
-  resolved="$(cd -P -- "${existing}" 2>/dev/null && pwd -P)" || resolved="${existing}"
-  local -a parts=()
-  local IFS=/
-  local remaining="${resolved}${rest}/"
-  while [[ -n "${remaining}" ]]; do
-    part="${remaining%%/*}"
-    remaining="${remaining#*/}"
-    case "${part}" in
-      ""|.) ;;
-      ..) [[ ${#parts[@]} -gt 0 ]] && unset 'parts[${#parts[@]}-1]' ;;
-      *) parts+=("${part}") ;;
-    esac
-  done
-  printf '/%s\n' "${parts[*]}"
+  # Portable fallback (macOS): Python resolves symlinks in path traversal order.
+  python -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$1"
 }
 
 canonicalize_link_target() {

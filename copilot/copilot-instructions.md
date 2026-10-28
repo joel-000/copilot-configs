@@ -12,23 +12,48 @@ Before deeper planning or implementation, identify the goal, largest uncertainty
 
 ## Maintainability
 
-This repository has multiple maintainers; code must be understandable without the conversation that produced it. Prioritise, in order:
+This repository has multiple maintainers; code must be understandable without the conversation that produced it. Simple, readable and maintainable is the default for plans, code, tests, scripts, documentation and infrastructure. Every abstraction, helper, layer, option or file is a cost to every future reader: the author justifies complexity, simplicity needs no defence. Judge every design decision against PEP 20:
+
+```text
+The Zen of Python, by Tim Peters
+
+Beautiful is better than ugly.
+Explicit is better than implicit.
+Simple is better than complex.
+Complex is better than complicated.
+Flat is better than nested.
+Sparse is better than dense.
+Readability counts.
+Special cases aren't special enough to break the rules.
+Although practicality beats purity.
+Errors should never pass silently.
+Unless explicitly silenced.
+In the face of ambiguity, refuse the temptation to guess.
+There should be one-- and preferably only one --obvious way to do it.
+Although that way may not be obvious at first unless you're Dutch.
+Now is better than never.
+Although never is often better than *right* now.
+If the implementation is hard to explain, it's a bad idea.
+If the implementation is easy to explain, it may be a good idea.
+Namespaces are one honking great idea -- let's do more of those!
+```
+
+Prioritise, in order:
 
 1. Correctness against the acceptance criteria.
 2. Readability for a developer unfamiliar with the change.
-3. Consistency with nearby code and repository conventions.
-4. Maintainability and ease of future modification.
-5. The smallest proportionate change.
+3. The smallest proportionate change.
+4. Consistency with nearby code and repository conventions.
 
-Complexity needs demonstrated justification. Prefer direct, explicit implementations over abstractions, indirection or configuration for hypothetical requirements. Introduce a helper or abstraction only when it removes clear repetition or follows an established repository pattern. Do not do unrelated refactoring, cleanup or speculative hardening.
+Add a helper or abstraction only for a stated requirement or an established repository pattern. Leave existing code untouched unless the task requires it; no refactoring or shared helpers in it without approval. Reuse existing repositories, examples and scripts, and state where configuration and secrets come from rather than assuming. No unrelated cleanup or speculative hardening.
 
 ## Review findings
 
-Change code for a finding only when it identifies a reachable, material risk within the current scope that existing controls do not address, and use the smallest repository-consistent fix. Challenge findings that are speculative, rely on unsupported assumptions, duplicate existing controls or need disproportionate complexity; defer valid out-of-scope findings that do not block safe completion. Reviewers define the problem or outcome; the Implementer owns disposition and chooses the simplest maintainable remediation.
+Change code for a finding only when it identifies a reachable, material in-scope risk that existing controls do not address, using the smallest repository-consistent fix. Challenge speculative, unsupported, duplicative or disproportionately complex findings; defer valid out-of-scope ones. The Implementer owns disposition and picks the simplest remediation.
 
 ## Tests
 
-Test observable behaviour, not implementation details, unreachable states or hypothetical requirements. Follow repository conventions and prefer a few readable tests over exhaustive or duplicative coverage. Use shared fixtures, builders, helpers or parametrisation only when they reduce repetition without obscuring behaviour.
+Test observable behaviour, not implementation details, unreachable states or hypothetical requirements. Prefer a few readable tests over exhaustive or duplicative coverage, following repository conventions. Use shared fixtures, builders, helpers or parametrisation only when they reduce repetition without obscuring behaviour.
 
 Emulators and mocks must not add behaviour the real service lacks (name translation, injected defaults, compatibility shims); pass configuration through unchanged so tests expose real defects. When fixing a bug, write the failing tests first and confirm they fail for the intended reason before changing production code.
 
@@ -46,4 +71,4 @@ Plan, options or analysis requests involve no code changes. List out-of-scope fi
 
 ## Validation
 
-Agents that modify repository files run focused tests first, then the relevant broader tests and static checks. Before final readiness, the Implementer removes unrelated changes and simplifies unnecessary helpers, abstractions and control flow.
+Agents that modify repository files run focused tests first, then the relevant broader tests and static checks. The Implementer simplifies every plan before presenting it, and before final readiness removes unrelated changes and unnecessary helpers, abstractions and control flow.

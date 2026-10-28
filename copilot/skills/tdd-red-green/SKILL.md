@@ -33,7 +33,7 @@ Use this skill to implement a change with **pytest** and **Hypothesis** by follo
 - Prefer real code paths, real collaborators, and real data transformations whenever the code can run locally and deterministically.
 - Implement the minimum production change needed for green; avoid speculative refactors or extra features during the green step.
 - Do not edit, weaken, delete, or broaden tests in the green step; once red is established, green is production-code-only.
-- In the green step, prefer defensive code over optimistic code: validate assumptions, handle edge cases explicitly, and fail clearly when inputs are invalid.
+- In the green step, prefer defensive code over optimistic code where the failing test or a stated requirement (including security findings) calls for it: validate those assumptions, handle those edge cases explicitly, and fail clearly when inputs are invalid. Do not add protection beyond that.
 - If the baseline is already failing, stop and explain that TDD progress is blocked until the relevant baseline is understood.
 - If the requested change is too large for one cycle, break it into the next smallest observable behavior and complete the first slice.
 

@@ -38,11 +38,13 @@ Do not block on:
 
 - hypothetical edge cases
 - unreachable states
-- style or design preferences
+- style or design preferences, other than the unjustified complexity criterion below
 - optional coverage
 - future requirements
 - implementation details
 - issues outside the approved scope
+
+During plan review, also block on unjustified complexity: the plan adds an abstraction, helper, layer or build wiring that cites no requirement, or a named simpler option demonstrably meets the same acceptance criteria. Use the plan's rejected-options lines as evidence. Do not recommend extra tests, hardening or deviations that expand scope unless they meet the blocking standard above.
 
 Prefer the smallest number of readable tests needed to protect the changed behaviour.
 

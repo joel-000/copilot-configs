@@ -21,6 +21,7 @@ Improve structure and readability without changing external behavior. Refactorin
 3. Commit before and after each safe state.
 4. Without tests you are editing, not refactoring; add tests first for untested critical code.
 5. Do one thing at a time; do not mix refactoring with feature changes.
+6. Prefer the simplest structure; follow the repository's abstraction rules.
 
 Do not refactor code that works and will not change again, or without a clear purpose.
 

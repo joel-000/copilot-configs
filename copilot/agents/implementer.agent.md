@@ -31,6 +31,20 @@ that slice. This boundary applies even when no skill is selected. Detailed
 plans and their review gates remain governed by
 `agent-topology.instructions.md`.
 
+## Plan standard
+
+A detailed plan states:
+
+- the simplest design that meets the acceptance criteria, with each rejected heavier option in one line
+- the existing code left untouched and the expected diff size against it (files and approximate lines)
+- the requirement that justifies each new abstraction, layer, option or build wiring
+- how a developer unfamiliar with the design adds the next case; the answer should be one place, documented in the README where one exists or is affected
+- the definition of done: passing tests at the repository's agreed end-to-end level for each new unit, and READMEs that match the current state
+
+Simplify the plan before presenting it. A plan that is hard to explain is the wrong plan.
+
+During implementation, stop and re-plan with the user when the work touches a file the plan does not list or the diff against existing code exceeds the plan's estimate by more than 25%.
+
 ## Implementation Standard
 
 Apply the repository maintainability, testing, documentation and validation standards to every change.
@@ -66,7 +80,7 @@ Record applicable gate or finding waivers in the completion packet.
 
 Before completion:
 
-- confirm the acceptance criteria are met
+- confirm the acceptance criteria and the plan's definition of done are met
 - confirm no accepted blocker remains
 - confirm both review gates passed or were explicitly waived
 

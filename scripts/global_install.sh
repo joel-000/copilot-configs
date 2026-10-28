@@ -25,7 +25,13 @@ EOF
 }
 
 canonicalize_path() {
-  realpath -m -- "$1"
+  if realpath -m -- / >/dev/null 2>&1; then
+    realpath -m -- "$1"
+    return
+  fi
+
+  # Portable fallback (macOS): Python resolves symlinks in path traversal order.
+  python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$1"
 }
 
 canonicalize_link_target() {

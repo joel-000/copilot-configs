@@ -54,7 +54,10 @@ canonicalize_path() {
   resolved="$(cd -P -- "${existing}" 2>/dev/null && pwd -P)" || resolved="${existing}"
   local -a parts=()
   local IFS=/
-  for part in ${resolved}${rest}; do
+  local remaining="${resolved}${rest}/"
+  while [[ -n "${remaining}" ]]; do
+    part="${remaining%%/*}"
+    remaining="${remaining#*/}"
     case "${part}" in
       ""|.) ;;
       ..) [[ ${#parts[@]} -gt 0 ]] && unset 'parts[${#parts[@]}-1]' ;;

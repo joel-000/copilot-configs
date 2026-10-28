@@ -10,7 +10,7 @@ Use this skill to implement a change with **pytest** and **Hypothesis** by follo
 
 1. **Red**: prefer adding exactly one new focused, adversarial test that expresses the next behavior and tries to break the implementation. Only modify an existing test when the behavior being specified is truly the same behavior and a new test would be redundant.
 2. Run the smallest relevant test scope and confirm it fails for the expected reason.
-3. **Green**: change production code as little as possible to make that test pass, using defensive logic that handles invalid, boundary, and surprising inputs explicitly. Do not change tests during green.
+3. **Green**: change production code as little as possible to make that test pass, adding defensive logic for invalid, boundary, or surprising inputs only where the failing test or a stated requirement calls for it. Do not change tests during green.
 4. Re-run the same narrow test scope until it passes.
 5. **Refactor** only if the code or test clearly needs cleanup, and keep the test green.
 

@@ -31,7 +31,7 @@ canonicalize_path() {
   fi
 
   # Portable fallback (macOS): Python resolves symlinks in path traversal order.
-  python -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$1"
+  python3 -c 'import os, sys; print(os.path.realpath(sys.argv[1]))' "$1"
 }
 
 canonicalize_link_target() {

@@ -47,7 +47,7 @@ During implementation, stop and re-plan with the user when the work touches a fi
 
 ## Implementation Standard
 
-Read the user-designated source of truth and acceptance criteria before implementing. Separate explicit requirements from assumptions, and surface proposed deviations before editing.
+Read the user-designated source of truth and treat its requirements as acceptance criteria. Separate requirements from assumptions, and surface conflicts or proposed deviations before editing.
 
 Apply the repository maintainability, testing, documentation and validation standards to every change.
 
@@ -85,7 +85,7 @@ Before completion:
 - confirm the acceptance criteria and the plan's definition of done are met
 - confirm no accepted blocker remains
 - confirm both review gates passed or were explicitly waived
-- obtain the delegated work's actual result, validation and blockers before reporting it complete; dispatch or idle status alone is not completion
+- inspect delegated work against the request, diff and relevant checks; obtain its result and blockers before reporting it complete
 
 ## Output
 

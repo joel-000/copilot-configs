@@ -64,10 +64,10 @@ Comment only non-obvious constraints, decisions or behaviour; do not narrate str
 ## Debugging failures
 
 - Run project commands from the repository or its worktree, not a session-state directory; keep environments, dependencies and build outputs in repository-supported locations.
-- For local or CI failures, inspect the relevant README, test configuration, fixtures and Compose files before changing code or setup. Reproduce the failure using the repository-supported environment and capture the working directory, exact command and actual error.
-- Diagnose the failing layer before changing dependencies or services. Preserve existing repository environments and shared services; do not replace or remove them to make a command pass.
-- Report diagnostic overrides explicitly and distinguish focused test results from full-suite results.
-- For repeated deployed-environment failures, gather evidence first (actual URLs, outputs, logs; a temporary diagnostic job is acceptable), state the cause, then propose the fix. Do not guess-fix.
+- Before changing code or setup, inspect the relevant documentation, test configuration, fixtures and Compose files. Record the working directory, exact command, relevant non-secret configuration and tool versions, and expected versus actual result.
+- Reproduce with the narrowest relevant command. Diagnose the failing layer and preserve the repository's documented test path, environments and shared services; do not replace or remove them to make a command pass.
+- After a fix, rerun the failing command and relevant broader checks. Report diagnostic overrides explicitly and distinguish focused results from full-suite results.
+- For repeated deployed failures, gather concrete evidence (actual URLs, outputs and logs; a temporary diagnostic job is acceptable), state the cause, then propose the fix. Do not guess-fix.
 
 ## Scope
 

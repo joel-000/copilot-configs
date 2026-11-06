@@ -61,9 +61,13 @@ Emulators and mocks must not add behaviour the real service lacks (name translat
 
 Comment only non-obvious constraints, decisions or behaviour; do not narrate straightforward code or preserve task-conversation context. Update documentation only when the change affects documented behaviour, interfaces, configuration or operating procedures.
 
-## Debugging deployed failures
+## Debugging failures
 
-For repeated CI or deployed-environment failures, gather evidence first (actual URLs, outputs, logs; a temporary diagnostic job is acceptable), state the cause, then propose the fix. Do not guess-fix.
+- Run project commands from the repository or its worktree, not a session-state directory; keep environments, dependencies and build outputs in repository-supported locations.
+- Before changing code or setup, inspect the relevant documentation, test configuration, fixtures and Compose files. Record the working directory, exact command, relevant non-secret configuration and tool versions, and expected versus actual result.
+- Reproduce with the narrowest relevant command. Diagnose the failing layer and preserve the repository's documented test path, environments and shared services; do not replace or remove them to make a command pass.
+- After a fix, rerun the failing command and relevant broader checks. Report diagnostic overrides explicitly and distinguish focused results from full-suite results.
+- For repeated deployed failures, gather concrete evidence (actual URLs, outputs and logs; a temporary diagnostic job is acceptable), state the cause, then propose the fix. Do not guess-fix.
 
 ## Scope
 

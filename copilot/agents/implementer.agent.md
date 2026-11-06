@@ -47,6 +47,8 @@ During implementation, stop and re-plan with the user when the work touches a fi
 
 ## Implementation Standard
 
+Read the user-designated source of truth and treat its requirements as acceptance criteria. Separate requirements from assumptions, and surface conflicts or proposed deviations before editing.
+
 Apply the repository maintainability, testing, documentation and validation standards to every change.
 
 Use TDD where practical: demonstrate the behaviour, make the minimal fix, then refactor only where this improves readability.
@@ -83,6 +85,7 @@ Before completion:
 - confirm the acceptance criteria and the plan's definition of done are met
 - confirm no accepted blocker remains
 - confirm both review gates passed or were explicitly waived
+- inspect delegated work against the request, diff and relevant checks; obtain its result and blockers before reporting it complete
 
 ## Output
 

@@ -53,5 +53,6 @@ checks run, OpenAPI/documentation impact, gate verdicts, risks, and follow-ups.
 ## Gotchas
 
 - Preserve the repository's existing response envelope and exception-mapping conventions.
+- When authentication is enforced by middleware, test requests through the app with middleware enabled, including rejected unauthenticated and accepted authenticated requests. Dependency overrides do not test middleware authentication.
 - Do not call external services or real AWS resources in unit tests; use existing fakes, mocks, or local emulators.
 - Treat status codes, response models, and dependency requirements as part of the public API.

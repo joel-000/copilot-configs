@@ -11,8 +11,7 @@ Apply these instructions when editing Python AWS code, Terraform, Docker Compose
 
 - Keep application code environment-neutral.
 - Reuse the repository's established local AWS emulator and test setup; use configuration to switch between it and real AWS.
-- Use Moto for fast in-process Python tests.
-- Use MiniStack for endpoint-based integration tests.
+- When no established path applies, use Moto for fast in-process Python tests and MiniStack for endpoint-based integration tests.
 - Prevent accidental calls to real AWS during local tests.
 
 ## Python rules

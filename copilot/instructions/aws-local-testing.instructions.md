@@ -13,6 +13,8 @@ Apply these instructions when editing Python AWS code, Terraform, Docker Compose
 - Use configuration to switch between local MiniStack and real AWS.
 - Use Moto for fast in-process Python tests.
 - Use MiniStack for endpoint-based integration tests.
+- First inspect the repository's existing integration-test documentation, fixtures, scripts, and CI configuration. Preserve its test path and established AWS emulator; do not replace them or introduce a competing emulator without an explicit requirement.
+- Run the documented integration-test path when relevant; unit tests do not substitute for it.
 - Prevent accidental calls to real AWS during local tests.
 
 ## Python rules

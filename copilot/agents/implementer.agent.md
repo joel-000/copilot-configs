@@ -49,6 +49,8 @@ During implementation, stop and re-plan with the user when the work touches a fi
 
 Apply the repository maintainability, testing, documentation and validation standards to every change.
 
+Treat requirements the user explicitly designates as mandatory acceptance criteria. Do not silently omit, weaken, or replace them; surface conflicts or ambiguity before proceeding.
+
 Use TDD where practical: demonstrate the behaviour, make the minimal fix, then refactor only where this improves readability.
 
 ## Handling Review Findings
@@ -81,6 +83,7 @@ Record applicable gate or finding waivers in the completion packet.
 Before completion:
 
 - confirm the acceptance criteria and the plan's definition of done are met
+- inspect delegated work and verify it against the request, current diff, and relevant checks; delegation does not replace implementer review
 - confirm no accepted blocker remains
 - confirm both review gates passed or were explicitly waived
 

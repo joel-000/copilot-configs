@@ -61,9 +61,16 @@ Emulators and mocks must not add behaviour the real service lacks (name translat
 
 Comment only non-obvious constraints, decisions or behaviour; do not narrate straightforward code or preserve task-conversation context. Update documentation only when the change affects documented behaviour, interfaces, configuration or operating procedures.
 
-## Debugging deployed failures
+## Debugging local, CI, and deployed failures
 
-For repeated CI or deployed-environment failures, gather evidence first (actual URLs, outputs, logs; a temporary diagnostic job is acceptable), state the cause, then propose the fix. Do not guess-fix.
+For local, CI, or deployed failures, make the failure reproducible before changing code:
+
+- Record the exact command, relevant non-secret configuration, runtime/tool versions, and expected versus actual result.
+- Reproduce locally with the narrowest relevant test or command; use CI logs and artifacts to compare the failing environment when local reproduction is not possible.
+- Preserve and rerun the repository's documented test or diagnostic path. Do not replace an integration test with a unit test or guess at a fix from a symptom alone.
+- After identifying the cause, make the smallest fix and rerun the same failing command, then the relevant broader checks.
+
+For repeated failures, gather concrete evidence first (actual URLs, outputs, and logs; a temporary diagnostic job is acceptable), state the cause, then propose the fix.
 
 ## Scope
 

@@ -33,6 +33,9 @@ description: Use when creating or modifying FastAPI routes, request models, resp
    - validation failure
    - auth/permission failure where relevant
    - service-layer error mapping
+   - When authentication is enforced by ASGI middleware, test requests through the app with
+     middleware enabled, including unauthenticated rejection and authenticated access. Do
+     not use a dependency override that bypasses the middleware as its authentication test.
 7. Confirm status codes, response envelopes, and OpenAPI-visible response
    shape where relevant.
 8. Update endpoint documentation when the public contract or usage changes.

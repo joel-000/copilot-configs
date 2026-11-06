@@ -53,5 +53,6 @@ checks run, OpenAPI/documentation impact, gate verdicts, risks, and follow-ups.
 ## Gotchas
 
 - Preserve the repository's existing response envelope and exception-mapping conventions.
+- Authentication performed by middleware runs before route dependency overrides; configure or exercise middleware separately when testing that path.
 - Do not call external services or real AWS resources in unit tests; use existing fakes, mocks, or local emulators.
 - Treat status codes, response models, and dependency requirements as part of the public API.

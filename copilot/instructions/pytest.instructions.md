@@ -9,5 +9,6 @@ applyTo: "**/test_*.py,**/*_test.py,**/tests/**/*.py"
 - Reuse fixtures from conftest.py.
 - Test public behaviour.
 - Mock external services at clear boundaries.
-- Do not call real AWS, databases or external HTTP services in unit tests.
+- Keep unit tests isolated from real AWS, databases and external HTTP services.
+- Preserve integration tests that intentionally use documented local services or emulators. Classify tests by their actual dependencies, and do not bypass their fixtures or replace their service path with mocks just to obtain a passing run.
 - Include negative, validation and edge cases where relevant.

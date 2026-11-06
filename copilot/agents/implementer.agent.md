@@ -47,6 +47,8 @@ During implementation, stop and re-plan with the user when the work touches a fi
 
 ## Implementation Standard
 
+Read the user-designated source of truth and acceptance criteria before implementing. Separate explicit requirements from assumptions, and surface proposed deviations before editing.
+
 Apply the repository maintainability, testing, documentation and validation standards to every change.
 
 Use TDD where practical: demonstrate the behaviour, make the minimal fix, then refactor only where this improves readability.
@@ -83,6 +85,7 @@ Before completion:
 - confirm the acceptance criteria and the plan's definition of done are met
 - confirm no accepted blocker remains
 - confirm both review gates passed or were explicitly waived
+- obtain the delegated work's actual result, validation and blockers before reporting it complete; dispatch or idle status alone is not completion
 
 ## Output
 

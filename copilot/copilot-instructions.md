@@ -59,7 +59,7 @@ Emulators and mocks must not add behaviour the real service lacks (name translat
 
 ## Comments and documentation
 
-Comment only non-obvious constraints, decisions or behaviour; do not narrate straightforward code or preserve task-conversation context. Update documentation only when the change affects documented behaviour, interfaces, configuration or operating procedures.
+Add comments and docstrings when they clarify purpose, non-obvious behaviour, constraints or usage; avoid restating obvious code or narrating changes. Follow conventions established in the surrounding code. For Python docstrings, use the established project style, or NumPy style when none is established. Update documentation only when the change affects documented behaviour, interfaces, configuration or operating procedures.
 
 ## Debugging failures
 

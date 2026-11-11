@@ -10,6 +10,12 @@ Omit AI attribution from every commit: no `Co-authored-by: Copilot App` or other
 
 Before deeper planning or implementation, identify the goal, largest uncertainty and smallest useful slice, then obtain explicit user approval. No skill-selection result may bypass this no-edit boundary. Gate, re-review and waiver mechanics are in `agent-topology.instructions.md`.
 
+## Parent branch and work protection
+
+Treat a child coding session's source branch and pre-existing uncommitted work as protected, regardless of branch name. Establish the starting Git state and keep task changes separate. Do not alter the source branch or stage, commit, discard or stash pre-existing changes without explicit user permission; ask the user if ownership is unclear.
+
+Implementation approval does not authorise commits, pushes or PR creation; these require explicit user authorisation. Runtime helpers inherit the approved task's permissions and restrictions without repeated approval.
+
 ## Maintainability
 
 This repository has multiple maintainers; code must be understandable without the conversation that produced it. Simple, readable and maintainable is the default for plans, code, tests, scripts, documentation and infrastructure. Every abstraction, helper, layer, option or file is a cost to every future reader: the author justifies complexity, simplicity needs no defence. Judge every design decision against PEP 20:

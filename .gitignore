@@ -41,3 +41,6 @@ build/
 .idea/
 *.iml
 out/
+
+# Copilot app Project memory profiles in UUID-like agent directories
+/copilot/agents/*-*-*-*-*/profile.md

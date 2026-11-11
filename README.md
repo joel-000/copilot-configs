@@ -10,7 +10,7 @@ The source of truth lives under `copilot/`. Its contents map directly to `~/.cop
 
 | Path | Purpose |
 | --- | --- |
-| `copilot/agents/` | Custom agents for planning, context compression, implementation, review, testing, security, Terraform, and terminal help |
+| `copilot/agents/` | Implementer and independent quality, security, and readability review agents |
 | `copilot/instructions/` | Reusable instruction files scoped by file type or workflow |
 | `copilot/skills/` | Reusable skills for common workflows |
 | `copilot/copilot-instructions.md` | Global Copilot instructions |
@@ -126,18 +126,19 @@ Review the copied `.github/` tree in the smoke-test directory before distributin
 
 1. Start with the Implementer approval checkpoint.
 2. Confirm the approved slice before deeper planning or implementation.
-3. Build a `Context Snapshot`, then generate the detailed implementation plan.
-4. Pass compact handoff packets between stages (approved slice, snapshot, delta, gate results) instead of replaying full transcripts.
+3. If a detailed plan exists, obtain quality, security, and readability reviews before implementation; small tasks do not require a detailed plan.
+4. Pass compact handoff packets (approved slice, plan or delta, and gate results) between stages.
 5. Run `python scripts/validate.py`.
 6. Run `bash scripts/repo_install.sh <smoke-test-dir>` without `--prune`.
-7. Review the installed `.github` tree before broader rollout.
+7. Review the implementation delta with all three gates before final readiness; re-review only when a later change materially affects a gate's concerns.
+8. Review the installed `.github` tree before broader rollout.
 
 ### Acceptance criteria
 
-- [ ] **Pass:** Implementer explicitly uses an approved slice. **Fail:** Work is broad or unscoped.
-- [ ] **Pass:** Context building happens before detailed implementation planning. **Fail:** Downstream agents re-scan the repo instead of reusing a snapshot.
-- [ ] **Pass:** Stage handoffs stay compact and delta-based. **Fail:** Later stages restate full prior outputs without need.
-- [ ] **Pass:** Implementation confirms the approved slice before edits. **Fail:** Work starts without scope confirmation.
+- [ ] **Pass:** Implementation stays within the approved slice. **Fail:** Work is broad or unscoped.
+- [ ] **Pass:** Detailed plans receive all three reviews before implementation. **Fail:** Implementation starts with a required gate blocked or outstanding.
+- [ ] **Pass:** Handoffs stay compact and delta-based. **Fail:** Later stages restate full prior outputs without need.
+- [ ] **Pass:** All three implementation gates pass or are explicitly waived before final readiness. **Fail:** A required gate is outstanding.
 - [ ] **Pass:** `python scripts/validate.py` exits successfully. **Fail:** Validator reports any error.
 - [ ] **Pass:** `bash scripts/repo_install.sh <smoke-test-dir>` runs without `--prune` and completes successfully. **Fail:** Install fails or uses prune mode.
 - [ ] **Pass:** Smoke-test `.github` tree is reviewed before wider rollout. **Fail:** No review checkpoint is recorded.

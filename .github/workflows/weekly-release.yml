@@ -1,0 +1,76 @@
+name: Weekly release
+
+on:
+  schedule:
+    - cron: "0 9 * * 0"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: weekly-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out master
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          ref: master
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Check for unreleased commits
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          tag="$(gh api "repos/$GITHUB_REPOSITORY/releases/latest" --jq .tag_name)"
+          if [[ ! "$tag" =~ ^v1\.(0|[1-9][0-9]*)$ ]]; then
+            echo "::error::Unexpected latest release tag: $tag"
+            exit 1
+          fi
+          if ! release_commit="$(git rev-parse --verify "refs/tags/$tag^{commit}")"; then
+            echo "::error::Cannot resolve latest release tag: $tag"
+            exit 1
+          fi
+          head_commit="$(git rev-parse --verify HEAD^{commit})"
+          if ! git merge-base --is-ancestor "$release_commit" "$head_commit"; then
+            echo "::error::Latest release is not an ancestor of checked master"
+            exit 1
+          fi
+          if [[ "$release_commit" == "$head_commit" ]]; then
+            echo "No unreleased commits."
+            exit 0
+          fi
+          next_tag="$(python3 -c 'import sys; print("v1." + str(int(sys.argv[1][3:]) + 1))' "$tag")"
+          echo "previous_tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "next_tag=$next_tag" >> "$GITHUB_OUTPUT"
+          echo "head_commit=$head_commit" >> "$GITHUB_OUTPUT"
+
+      - name: Validate pack
+        if: steps.check.outputs.next_tag != ''
+        run: python3 scripts/validate.py
+
+      - name: Publish release
+        if: steps.check.outputs.next_tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREVIOUS_TAG: ${{ steps.check.outputs.previous_tag }}
+          NEXT_TAG: ${{ steps.check.outputs.next_tag }}
+          HEAD_COMMIT: ${{ steps.check.outputs.head_commit }}
+        run: |
+          set -euo pipefail
+          if ! gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" \
+            -f "ref=refs/tags/$NEXT_TAG" -f "sha=$HEAD_COMMIT"; then
+            existing_commit="$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$NEXT_TAG" --jq .object.sha)"
+            if [[ "$existing_commit" != "$HEAD_COMMIT" ]]; then
+              echo "::error::Existing tag $NEXT_TAG does not point to checked master"
+              exit 1
+            fi
+          fi
+          gh release create "$NEXT_TAG" --repo "$GITHUB_REPOSITORY" \
+            --verify-tag --generate-notes --notes-start-tag "$PREVIOUS_TAG" --title "$NEXT_TAG"

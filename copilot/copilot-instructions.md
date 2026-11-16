@@ -79,6 +79,8 @@ Add comments and docstrings when they clarify purpose, non-obvious behaviour, co
 
 Plan, options or analysis requests involve no code changes. List out-of-scope findings as follow-ups instead of fixing them. Do not reference scratch notes or planning documents in code, merge request descriptions or tickets.
 
+When an adjacent issue is not required for the requested outcome, do not silently expand scope. Ask whether to include it and briefly explain whether it predates this work, what code or behavior it affects, any wider impact or risk, and the consequence of deferring it. Validation failures are evidence to report, not automatic permission to expand scope.
+
 ## Validation
 
 Agents that modify repository files run focused tests first, then the relevant broader tests and static checks. The Implementer simplifies every plan before presenting it, and before final readiness removes unrelated changes and unnecessary helpers, abstractions and control flow.

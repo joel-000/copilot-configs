@@ -37,6 +37,14 @@ Use shared models for positional tuples or repacking only when semantics match.
 Avoid arbitrary size thresholds, blanket bans on generators, tuples or helpers,
 personal preferences, broad refactors and verbosity for its own sake.
 
+Review the diff for avoidable noise, such as unchanged code shown as deleted
+and re-added around an insertion. Distinguish actual movement from diff
+alignment. Where an equally clear, behaviour-preserving placement keeps existing
+code intact, prefer it; do not reorder logic solely to shorten the diff.
+
+Report concrete avoidable noise as non-blocking unless it materially obscures
+the change.
+
 Simplify before requesting comments. For necessary complexity or non-obvious
 intent, request a focused comment or docstring explaining the specific purpose,
 constraint, dependency, transformation, surprising choice or dense expression.

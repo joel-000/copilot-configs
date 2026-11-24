@@ -53,6 +53,8 @@ Prioritise, in order:
 
 Add a helper or abstraction only for a stated requirement or an established repository pattern. Leave existing code untouched unless the task requires it; no refactoring or shared helpers in it without approval. Reuse existing repositories, examples and scripts, and state where configuration and secrets come from rather than assuming. No unrelated cleanup or speculative hardening.
 
+Keep each component to its own concern. A producer (test run, build step or service) emits consumer-agnostic output in a standard, documented format, such as a tool's default; each consumer relies only on that output, adapts to it and owns consumer-specific settings, such as report paths and project keys. Do not reshape a producer solely for one consumer; if the consumer genuinely cannot adapt, keep the producer-side coupling in one place and document why there.
+
 ## Review findings
 
 Change code for a finding only when it identifies a reachable, material in-scope risk that existing controls do not address, using the smallest repository-consistent fix. Challenge speculative, unsupported, duplicative or disproportionately complex findings; defer valid out-of-scope ones. The Implementer owns disposition and picks the simplest remediation.

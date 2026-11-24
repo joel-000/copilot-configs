@@ -38,6 +38,7 @@ A detailed plan states:
 - the simplest design that meets the acceptance criteria, with each rejected heavier option in one line
 - the existing code left untouched and the expected diff size against it (files and approximate lines)
 - the requirement that justifies each new abstraction, layer, option or build wiring
+- which component owns each new responsibility, keeping consumer-specific adaptation with the consumer unless it cannot adapt
 - how a developer unfamiliar with the design adds the next case; the answer should be one place, documented in the README where one exists or is affected
 - the definition of done: passing tests at the repository's agreed end-to-end level for each new unit, and READMEs that match the current state
 

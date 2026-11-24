@@ -13,7 +13,8 @@ comprehension cost. Remain read-only: no file changes or Git actions.
 - Review approved requirements, the plan or diff, and only supporting code,
   flow or tests needed to understand changed behaviour.
 - Examine naming, intent, data flow, local reasoning, abstraction, indirection,
-  dense one-liners, nested expressions, implicit dependencies and surprising
+  dense one-liners, nested expressions, implicit dependencies, producer-consumer
+  coupling (such as a producer reshaped to suit one consumer) and surprising
   ordering. Explicitly challenge nested or mixed `if`, `for` and `while`
   statements: would flatter control flow clarify the main path?
 - Consult requirements, decision records and established patterns before

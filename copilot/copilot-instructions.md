@@ -2,47 +2,16 @@
 
 # Repository Instructions
 
-## Commit attribution
+## Approval, commits and branch protection
 
-Omit AI attribution from every commit: no `Co-authored-by: Copilot App` or other AI co-author trailers and no AI-generated signatures, in any workflow, unless the user explicitly requests attribution for that commit. Do not change Git author identity or signing settings.
-
-## Universal approval boundary
-
-Before deeper planning or implementation, identify the goal, largest uncertainty and smallest useful slice, then obtain explicit user approval. No skill-selection result may bypass this no-edit boundary. Gate, re-review and waiver mechanics are in `agent-topology.instructions.md`.
-
-## Parent branch and work protection
-
-Treat a child coding session's source branch and pre-existing uncommitted work as protected, regardless of branch name. Establish the starting Git state and keep task changes separate. Do not alter the source branch or stage, commit, discard or stash pre-existing changes without explicit user permission; ask the user if ownership is unclear.
-
-Implementation approval does not authorise commits, pushes or PR creation; these require explicit user authorisation. Runtime helpers inherit the approved task's permissions and restrictions without repeated approval.
+- Before deeper planning or implementation, identify the goal, largest uncertainty and smallest useful slice, then obtain explicit user approval. No skill-selection result may bypass this no-edit boundary. Gate, re-review and waiver mechanics are in `agent-topology.instructions.md`.
+- Implementation approval does not authorise commits, pushes or PR creation; these require explicit user authorisation. Runtime helpers inherit the approved task's permissions and restrictions without repeated approval.
+- Omit AI attribution from every commit, in any workflow (no `Co-authored-by: Copilot App` or other AI co-author trailers, no AI-generated signatures), unless the user explicitly requests it for that commit. Do not change Git author identity or signing settings.
+- Treat a child coding session's source branch and pre-existing uncommitted work as protected, regardless of branch name. Establish the starting Git state and keep task changes separate. Do not alter the source branch or stage, commit, discard or stash pre-existing changes without explicit user permission; ask the user if ownership is unclear.
 
 ## Maintainability
 
-This repository has multiple maintainers; code must be understandable without the conversation that produced it. Simple, readable and maintainable is the default for plans, code, tests, scripts, documentation and infrastructure. Every abstraction, helper, layer, option or file is a cost to every future reader: the author justifies complexity, simplicity needs no defence. Judge every design decision against PEP 20:
-
-```text
-The Zen of Python, by Tim Peters
-
-Beautiful is better than ugly.
-Explicit is better than implicit.
-Simple is better than complex.
-Complex is better than complicated.
-Flat is better than nested.
-Sparse is better than dense.
-Readability counts.
-Special cases aren't special enough to break the rules.
-Although practicality beats purity.
-Errors should never pass silently.
-Unless explicitly silenced.
-In the face of ambiguity, refuse the temptation to guess.
-There should be one-- and preferably only one --obvious way to do it.
-Although that way may not be obvious at first unless you're Dutch.
-Now is better than never.
-Although never is often better than *right* now.
-If the implementation is hard to explain, it's a bad idea.
-If the implementation is easy to explain, it may be a good idea.
-Namespaces are one honking great idea -- let's do more of those!
-```
+Multiple maintainers must understand the work without the conversation that produced it. Simple, readable and maintainable is the default for plans, code, tests, scripts, documentation and infrastructure. Every abstraction, helper, layer, option or file costs every future reader: the author justifies complexity; simplicity needs no defence. Judge every design decision against PEP 20 (The Zen of Python), especially: explicit over implicit; simple over complex, complex over complicated; flat over nested; readability counts; practicality beats purity; errors never pass silently unless explicitly silenced; refuse to guess; one obvious way; hard to explain means a bad idea.
 
 Prioritise, in order:
 
@@ -51,38 +20,37 @@ Prioritise, in order:
 3. The smallest proportionate change.
 4. Consistency with nearby code and repository conventions.
 
-Add a helper or abstraction only for a stated requirement or an established repository pattern. Leave existing code untouched unless the task requires it; no refactoring or shared helpers in it without approval. Reuse existing repositories, examples and scripts, and state where configuration and secrets come from rather than assuming. No unrelated cleanup or speculative hardening.
-
-Keep each component to its own concern. A producer (test run, build step or service) emits consumer-agnostic output in a standard, documented format, such as a tool's default; each consumer relies only on that output, adapts to it and owns consumer-specific settings, such as report paths and project keys. Do not reshape a producer solely for one consumer; if the consumer genuinely cannot adapt, keep the producer-side coupling in one place and document why there.
+- Add a helper or abstraction only for a stated requirement or an established repository pattern. Leave existing code untouched unless the task requires it; no refactoring or shared helpers in it without approval. No unrelated cleanup or speculative hardening.
+- Reuse existing repositories, examples and scripts; state where configuration and secrets come from rather than assuming.
+- Keep each component to its own concern. A producer (test run, build step or service) emits consumer-agnostic output in a standard, documented format, such as a tool's default; each consumer relies only on that output, adapts to it and owns consumer-specific settings, such as report paths and project keys. Do not reshape a producer solely for one consumer; if the consumer genuinely cannot adapt, keep the producer-side coupling in one place and document why there.
+- Simplify every plan before presenting it. Before final readiness, remove unrelated changes and unnecessary helpers, abstractions and control flow.
 
 ## Review findings
 
-Change code for a finding only when it identifies a reachable, material in-scope risk that existing controls do not address, using the smallest repository-consistent fix. Challenge speculative, unsupported, duplicative or disproportionately complex findings; defer valid out-of-scope ones. The Implementer owns disposition and picks the simplest remediation.
+Change code for a finding only when it identifies a reachable, material in-scope risk that existing controls do not address, using the smallest repository-consistent fix. Challenge speculative, unsupported, duplicative or disproportionately complex findings; defer valid out-of-scope ones. The implementing agent owns disposition and picks the simplest remediation.
 
 ## Tests
 
-Test observable behaviour, not implementation details, unreachable states or hypothetical requirements. Prefer a few readable tests over exhaustive or duplicative coverage, following repository conventions. Use shared fixtures, builders, helpers or parametrisation only when they reduce repetition without obscuring behaviour.
-
-Emulators and mocks must not add behaviour the real service lacks (name translation, injected defaults, compatibility shims); pass configuration through unchanged so tests expose real defects. When fixing a bug, write the failing tests first and confirm they fail for the intended reason before changing production code.
+- Test observable behaviour, not implementation details, unreachable states or hypothetical requirements. Prefer a few readable tests over exhaustive or duplicative coverage, following repository conventions; use shared fixtures, builders, helpers or parametrisation only when they reduce repetition without obscuring behaviour.
+- Emulators and mocks must not add behaviour the real service lacks (name translation, injected defaults, compatibility shims); pass configuration through unchanged so tests expose real defects.
+- When fixing a bug, write the failing tests first and confirm they fail for the intended reason before changing production code.
 
 ## Comments and documentation
 
-Add comments and docstrings when they clarify purpose, non-obvious behaviour, constraints or usage; avoid restating obvious code or narrating changes. Follow conventions established in the surrounding code. For Python docstrings, use the established project style, or NumPy style when none is established. Update documentation only when the change affects documented behaviour, interfaces, configuration or operating procedures.
+Add comments and docstrings when they clarify purpose, non-obvious behaviour, constraints or usage, following surrounding conventions; do not restate obvious code or narrate changes. Python docstrings follow the established project style, otherwise NumPy style. Update documentation only when the change affects documented behaviour, interfaces, configuration or operating procedures.
 
-## Debugging failures
+## Debugging and validation
 
 - Run project commands from the repository or its worktree, not a session-state directory; keep environments, dependencies and build outputs in repository-supported locations.
 - Before changing code or setup, inspect the relevant documentation, test configuration, fixtures and Compose files. Record the working directory, exact command, relevant non-secret configuration and tool versions, and expected versus actual result.
-- Reproduce with the narrowest relevant command. Diagnose the failing layer and preserve the repository's documented test path, environments and shared services; do not replace or remove them to make a command pass.
-- After a fix, rerun the failing command and relevant broader checks. Report diagnostic overrides explicitly and distinguish focused results from full-suite results.
+- Reproduce with the narrowest relevant command and diagnose the failing layer. Preserve the documented test path, environments and shared services; do not replace or remove them to make a command pass.
+- After a fix, rerun the failing command and relevant broader checks.
+- After modifying repository files, run focused tests, then relevant broader tests and static checks. Report diagnostic overrides explicitly and distinguish focused from full-suite results.
 - For repeated deployed failures, gather concrete evidence (actual URLs, outputs and logs; a temporary diagnostic job is acceptable), state the cause, then propose the fix. Do not guess-fix.
 
 ## Scope
 
-Plan, options or analysis requests involve no code changes. List out-of-scope findings as follow-ups instead of fixing them. Do not reference scratch notes or planning documents in code, merge request descriptions or tickets.
-
-When an adjacent issue is not required for the requested outcome, do not silently expand scope. Ask whether to include it and briefly explain whether it predates this work, what code or behavior it affects, any wider impact or risk, and the consequence of deferring it. Validation failures are evidence to report, not automatic permission to expand scope.
-
-## Validation
-
-Agents that modify repository files run focused tests first, then the relevant broader tests and static checks. The Implementer simplifies every plan before presenting it, and before final readiness removes unrelated changes and unnecessary helpers, abstractions and control flow.
+- Plan, options or analysis requests involve no code changes.
+- Do not silently expand scope. When an adjacent issue is not required for the requested outcome, ask whether to include it, briefly explaining whether it predates this work, what code or behaviour it affects, any wider impact or risk, and the consequence of deferring it. Validation failures are evidence to report, not automatic permission to expand scope.
+- List out-of-scope findings as follow-ups instead of fixing them.
+- Do not reference scratch notes or planning documents in code, merge request descriptions or tickets.

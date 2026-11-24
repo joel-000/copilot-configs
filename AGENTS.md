@@ -43,6 +43,22 @@
 - Keep skills directory-based (`skills/<name>/SKILL.md`); agents and
   instructions are flat files in their own folders.
 
+## Decision board
+- Use the decision board for substantive decisions with real tradeoffs or
+  uncertainty, such as what to move, cut or reword, or which design to adopt.
+  Skip routine mechanical choices with one obvious answer.
+- Brief three independent agents on distinct models with the same relevant
+  context and constraints. Use existing agents within the allowed topology;
+  no new agent type is required. Ask each for a verdict, concrete reasons and
+  a recommended change (replacement wording where relevant).
+- Compare verdicts, revise and re-run the board to seek consensus. If
+  disagreement remains after the re-run, stop and report it to the user;
+  never settle it by majority vote or any single agent's view.
+- Record the decision and board verdicts in the completion packet.
+- The decision board advises and is separate from the review gates. It does
+  not replace user approval, repository constraints or the quality, security
+  and readability gates.
+
 ## Developer workflow
 - Validate before and after edits:
   ```bash

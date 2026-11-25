@@ -44,8 +44,9 @@ Add comments and docstrings when they clarify purpose, non-obvious behaviour, co
 - Run project commands from the repository or its worktree, not a session-state directory; keep environments, dependencies and build outputs in repository-supported locations.
 - Before changing code or setup, inspect the relevant documentation, test configuration, fixtures and Compose files. Record the working directory, exact command, relevant non-secret configuration and tool versions, and expected versus actual result.
 - Reproduce with the narrowest relevant command and diagnose the failing layer. Preserve the documented test path, environments and shared services; do not replace or remove them to make a command pass.
+- Before attributing a test failure to a change, run the same check on the pre-change baseline under comparable configuration and dependencies and compare the results; if no baseline is available, report regression status as unverified.
 - After a fix, rerun the failing command and relevant broader checks.
-- After modifying repository files, run focused tests, then relevant broader tests and static checks. Report diagnostic overrides explicitly and distinguish focused from full-suite results.
+- After modifying repository files, run focused tests, then relevant broader tests and static checks. Report diagnostic overrides explicitly, distinguish focused from full-suite results, and state which applicable validation stages (such as coverage generation, coverage import, analysis and quality gates) were performed, with each stage's observed outcome.
 - For repeated deployed failures, gather concrete evidence (actual URLs, outputs and logs; a temporary diagnostic job is acceptable), state the cause, then propose the fix. Do not guess-fix.
 
 ## Scope

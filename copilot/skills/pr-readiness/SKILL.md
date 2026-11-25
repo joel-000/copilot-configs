@@ -34,8 +34,9 @@ assessment**. State the readiness verdict explicitly.
   Use the ticket name only when it accurately describes the change. Otherwise,
   follow the key with a concise change summary. Without a ticket, use a concise,
   specific summary.
-- **Description:** Use these headings:
-  - **What:** Describe the change and its scope.
+- **Description:** Keep it concise but sufficient for reviewers; avoid a
+  file-by-file inventory. Use these headings:
+  - **What:** Describe the behaviour or outcome that changes and its scope.
   - **Why:** Explain the problem or motivation.
   - **How:** Summarize the approach.
   - **Testing:** List tests and checks with their results. Include documentation

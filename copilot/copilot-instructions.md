@@ -55,3 +55,5 @@ Add comments and docstrings when they clarify purpose, non-obvious behaviour, co
 - Do not silently expand scope. When an adjacent issue is not required for the requested outcome, ask whether to include it, briefly explaining whether it predates this work, what code or behaviour it affects, any wider impact or risk, and the consequence of deferring it. Validation failures are evidence to report, not automatic permission to expand scope.
 - List out-of-scope findings as follow-ups instead of fixing them.
 - Do not reference scratch notes or planning documents in code, merge request descriptions or tickets.
+
+For internal agent-to-agent status messages, review verdicts, and handoffs, lead with the current outcome and put any blocker, caveat, condition, or permission limit beside it. Use concise, grammatical English, keeping the evidence, uncertainty, and context needed to act; do not compress restrictions or approvals. Preserve verbatim user requests and other quoted text, paths, commands, and errors exactly. This does not change the requirements for complete standalone kickoff prompts or user-facing messages.

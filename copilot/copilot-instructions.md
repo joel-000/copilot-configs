@@ -37,7 +37,7 @@ Change code for a finding only when it identifies a reachable, material in-scope
 
 ## Comments and documentation
 
-Add comments and docstrings when they clarify purpose, non-obvious behaviour, constraints or usage, following surrounding conventions; do not restate obvious code or narrate changes. Python docstrings follow the established project style, otherwise NumPy style. Update documentation only when the change affects documented behaviour, interfaces, configuration or operating procedures.
+Add comments and docstrings when they clarify purpose, non-obvious behaviour, constraints or usage, following surrounding conventions; do not restate obvious code or narrate changes. Python docstrings follow the established project style, otherwise Google style. Update documentation only when the change affects documented behaviour, interfaces, configuration or operating procedures.
 
 ## Debugging and validation
 
